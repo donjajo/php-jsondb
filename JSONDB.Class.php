@@ -63,7 +63,7 @@ class JSONDB {
 
 		// Reset where
 		$this->where( [] );
-		
+
 		if( $this->check_file() ) {
 			$this->content = ( array ) json_decode( file_get_contents( $this->file ) );
 		}
@@ -132,7 +132,7 @@ class JSONDB {
 			}
 		}
 		elseif( !empty( $this->where ) && empty( $this->last_indexes ) ) {
-			trigger_error( 'Key not found ' );
+			null;
 		}
 		else {
 			foreach( $this->content as $i => $v ) {
