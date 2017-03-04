@@ -47,7 +47,7 @@ Get back data, just like MySQL in PHP
 ```
 
 ##### Where Statement:
-Only an array key and value is supported at the moment
+
 ```php
 	<?php 
 	$users = $json_db->select( 'name, state'  )
@@ -74,11 +74,23 @@ You can also update same JSON file with these methods
 ```php
 	<?php
 	$json_db->delete()
-		->from( 'user.json' )
+		->from( 'users.json' )
 		->where( [ 'name' => 'Thomas' ] )
 		->trigger();
 
 ```
 *Without the **where()** method, it will deletes all rows*
+
+#### Exporting to MySQL
+You can export the JSON back to SQL file by using this method and providing an output
+```php
+        <?php 
+        $json_db->to_mysql( 'users.json', 'users.sql' );
+```
+Disable CREATE TABLE
+```php
+        <?php 
+        $json_db->to_mysql( 'users.json', 'users.sql', false );
+```
 
 **PS:** Do not use this code on production server
