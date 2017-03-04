@@ -47,12 +47,18 @@ Get back data, just like MySQL in PHP
 ```
 
 ##### Where Statement:
-
+This WHERE only works as AND Operator at the moment
 ```php
 	<?php 
 	$users = $json_db->select( 'name, state'  )
 		->from( 'users.json' )
 		->where( [ 'name' => 'Thomas' ] )
+		->get();
+	print_r( $users );
+	
+	$users = $json_db->select( 'name, state'  )
+		->from( 'users.json' )
+		->where( [ 'name' => 'Thomas', 'state' => 'Nigeria' ] )
 		->get();
 	print_r( $users );
 	
