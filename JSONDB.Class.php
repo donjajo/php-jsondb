@@ -208,6 +208,62 @@ class JSONDB {
 		return $r;
 	}
 
+	public function to_mysql( $from, $to, $create_table = true ) {
+		$this->from( $from );
+		if( $this->content ) {
+			$table = pathinfo( $to, PATHINFO_FILENAME );
+
+			$sql = "-- PHP-JSONDB JSON to MySQL Dump
+--\r\n\r\n";
+			if( $create_table ) {
+				$sql .= "
+-- Table Structure for `" . $table . "`
+--
+
+CREATE TABLE `" . $table . "`
+	(
+					";
+				$first_row = ( array ) $this->content[ 0 ];
+				foreach( array_keys( $first_row ) as $column ) {
+					$s = '`' . $column . '` ' . $this->_to_mysql_type( gettype( $first_row[ $column ] ) ) ;
+					$s .= ( next( $first_row ) ? ',' : '' );
+					$sql .= $s;
+				}
+				$sql .= "
+	);\r\n";
+			}
+
+			foreach( $this->content as $values ) {
+				$values = ( array ) $values;
+				$v = array_map( function( $vv ) {
+					$vv = ( is_array( $vv ) || is_object( $vv ) ? serialize( $vv ) : $vv );
+					return "'" . addslashes( $vv ) . "'";
+				}, array_values( $values ) );
+
+				$c = array_map( function( $vv ) {
+					return "`" . $vv . "`";
+				}, array_keys( $values ) );
+				$sql .= sprintf( "INSERT INTO `%s` ( %s ) VALUES ( %s );\n", $table, implode( ', ', $c ), implode( ', ', $v ) );
+			}
+			file_put_contents( $to, $sql );
+			return true;
+		}
+		else 
+			return false;
+	}
+
+	private function _to_mysql_type( $type ) {
+		if( $type == 'bool' ) 
+			$return = 'BOOLEAN';
+		elseif( $type == 'integer' ) 
+			$return = 'INT';
+		elseif( $type == 'double' ) 
+			$return = strtoupper( $type );
+		else
+			$return = 'VARCHAR( 255 )';
+		return $return;
+	}
+
 	public function get() {
 		$content = ( !empty( $this->where ) ? $this->where_result() : $this->content );
 		if( $this->select && !in_array( '*', $this->select ) ) {
