@@ -99,4 +99,3 @@ Disable CREATE TABLE
         $json_db->to_mysql( 'users.json', 'users.sql', false );
 ```
 
-**PS:** Do not use this code on production server
