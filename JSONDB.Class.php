@@ -70,7 +70,7 @@ class JSONDB {
 		return $this;
 	}
 
-	public function where( array $columns, $merge = 'AND' ) {
+	public function where( array $columns, $merge = 'OR' ) {
 		$this->where = $columns;
 		$this->merge = $merge;
 		return $this;
@@ -208,6 +208,36 @@ class JSONDB {
 		return $r;
 	}
 
+	
+	private function where_and_result() {
+		/*
+			Validates the where statement values
+		*/
+		$r = [];
+
+		// Loop through the db rows. Ge the index and row
+		foreach( $this->content as $index => $row ) {
+
+			// Make sure its array data type
+			$row = ( array ) $row;
+
+			
+			//check if the row = where['col'=>'val', 'col2'=>'val2']
+			if(!array_diff($this->where,$row)) {
+				$r[] = $row;
+				// Append also each row array key
+				$this->last_indexes[] = $index;			
+				
+			}
+			else continue ;
+			
+
+		}
+		return $r;
+	}	
+	
+	
+	
 	public function to_mysql( $from, $to, $create_table = true ) {
 		$this->from( $from );
 		if( $this->content ) {
@@ -265,7 +295,20 @@ CREATE TABLE `" . $table . "`
 	}
 
 	public function get() {
-		$content = ( !empty( $this->where ) ? $this->where_result() : $this->content );
+		
+		if($this->where != null) {
+			if($this->merge == 'OR') {
+				$content = $this->where_result();
+			}
+			else {
+				$content = $this->where_and_result();
+			}
+		}
+		else $content = $this->content; 
+
+		
+		
+		
 		if( $this->select && !in_array( '*', $this->select ) ) {
 			$r = [];
 			foreach( $content as $id => $row ) {
