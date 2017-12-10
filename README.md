@@ -1,5 +1,6 @@
 ## php-jsondb
-A PHP Class that reads JSON file as a database. Use for sample DBs
+A PHP Class that reads JSON file as a database. Use for sample DBs. This is a update that fixes the 
+where "AND" and "OR" feature 
 
 ### Usage
 Include the file `<?php include( 'JSONDB.Class.php' );?>`
@@ -47,7 +48,7 @@ Get back data, just like MySQL in PHP
 ```
 
 ##### Where Statement:
-This WHERE only works as AND Operator at the moment
+This WHERE works as AND Operator at the moment or OR
 ```php
 	<?php 
 	$users = $json_db->select( 'name, state'  )
@@ -56,11 +57,20 @@ This WHERE only works as AND Operator at the moment
 		->get();
 	print_r( $users );
 	
+	// Defaults to Thomas OR Nigeria 
 	$users = $json_db->select( 'name, state'  )
 		->from( 'users.json' )
 		->where( [ 'name' => 'Thomas', 'state' => 'Nigeria' ] )
 		->get();
-	print_r( $users );
+	print_r( $users );  
+	
+	// Now is THOMAS AND Nigeria 
+	$users = $json_db->select( 'name, state'  )
+		->from( 'users.json' )
+		->where( [ 'name' => 'Thomas', 'state' => 'Nigeria' ], 'AND' )
+		->get();
+	print_r( $users );  	
+	
 	
 ```
 
