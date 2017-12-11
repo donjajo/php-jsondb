@@ -179,33 +179,38 @@ class JSONDB {
 		/*
 			Validates the where statement values
 		*/
-		$r = [];
 
-		// Loop through the existing values. Ge the index and row
-		foreach( $this->content as $index => $row ) {
+		if( $this->merge == 'AND' ) {
+			return $this->where_and_result();
+		}
+		else {
+			$r = [];
 
-			// Make sure its array data type
-			$row = ( array ) $row;
+			// Loop through the existing values. Ge the index and row
+			foreach( $this->content as $index => $row ) {
 
-			// Loop again through each row,  get columns and values
-			foreach( $row as $column => $value ) {
+				// Make sure its array data type
+				$row = ( array ) $row;
 
-				// If each of the column is provided in the where statement
-				if( in_array( $column, array_keys( $this->where ) ) ) {
-					// To be sure the where column value and existing row column value matches
-					if( $this->where[ $column ] == $row[ $column ] ) {
-						// Append all to be modified row into a array variable
-						$r[] = $row;
+				// Loop again through each row,  get columns and values
+				foreach( $row as $column => $value ) {
+					// If each of the column is provided in the where statement
+					if( in_array( $column, array_keys( $this->where ) ) ) {
+						// To be sure the where column value and existing row column value matches
+						if( $this->where[ $column ] == $row[ $column ] ) {
+							// Append all to be modified row into a array variable
+							$r[] = $row;
 
-						// Append also each row array key
-						$this->last_indexes[] = $index;
+							// Append also each row array key
+							$this->last_indexes[] = $index;
+						}
+						else 
+							continue;
 					}
-					else 
-						continue;
 				}
 			}
+			return $r;
 		}
-		return $r;
 	}
 
 	
@@ -295,19 +300,11 @@ CREATE TABLE `" . $table . "`
 	}
 
 	public function get() {
-		
 		if($this->where != null) {
-			if($this->merge == 'OR') {
-				$content = $this->where_result();
-			}
-			else {
-				$content = $this->where_and_result();
-			}
+			$content = $this->where_result();
 		}
-		else $content = $this->content; 
-
-		
-		
+		else 
+			$content = $this->content; 
 		
 		if( $this->select && !in_array( '*', $this->select ) ) {
 			$r = [];
