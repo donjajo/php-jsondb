@@ -1,6 +1,5 @@
 ## php-jsondb
-A PHP Class that reads JSON file as a database. Use for sample DBs. This is a update that fixes the 
-where "AND" and "OR" feature 
+A PHP Class that reads JSON file as a database. Use for sample DBs.
 
 ### Usage
 Include the file `<?php include( 'JSONDB.Class.php' );?>`
@@ -81,7 +80,7 @@ You can also update same JSON file with these methods
 	$json_db->update( [ 'name' => 'Oji', 'age' => 10 ] )
 		->from( 'users.json' )
 		->where( [ 'name' => 'Thomas' ] )
-		->get();
+		->trigger();
 	
 ```
 *Without the **where()** method, it will update all rows*
