@@ -73,6 +73,18 @@ This WHERE works as AND Operator at the moment or OR
 	
 ```
 
+##### Order By:
+Thanks to [Tarun Shanker](http://in.linkedin.com/in/tarunshankerpandey) for this feature. By passing the `order_by()` method, the result is sorted with 2 arguments of the column name and sort method - `JSONDB::ASC` and `JSONDB::DESC`
+```php
+	<?php 
+	$users = $json_db->select( 'name, state'  )
+		->from( 'users.json' )
+		->where( [ 'name' => 'Thomas' ] )
+		->order_by( 'age', JSONDB::ASC )
+		->get();
+	print_r( $users );
+```
+
 #### Updating Row
 You can also update same JSON file with these methods
 ```php
@@ -108,3 +120,10 @@ Disable CREATE TABLE
         $json_db->to_mysql( 'users.json', 'users.sql', false );
 ```
 
+#### Exporting to XML
+[Tarun Shanker](http://in.linkedin.com/in/tarunshankerpandey) also provided a feature to export data to an XML file 
+```php
+	<?php 
+	if( $json_db->to_xml( 'users.json', 'users.xml' ) ) {
+		echo 'Saved!';
+	}
