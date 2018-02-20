@@ -1,9 +1,10 @@
 <?php 
 
-include_once('JsonDB.class.php');
+include_once('JSONDB.Class.php');
 
 $json_db = new JSONDB();
 
+// $json_db->to_xml( 'users.json', 'bla.xml' );
 $json_db->from( 'users.json' );
 
 /* $json_db->insert( 'users.json', 
@@ -14,7 +15,7 @@ $json_db->from( 'users.json' );
 		]);   */ 
 		
 
-$rows = $json_db->where(['name'=>'Steve','age'=>'24'],'AND')->get();
+$rows = $json_db->order_by( 'name', JSONDB::ASC )->get();
 
 foreach ($rows as $row) {
 	print_r($row);

@@ -1,7 +1,12 @@
 <?php 
 class JSONDB {
 	public $file, $content = [];
-	private $where, $select, $merge, $delete = false, $last_indexes = [], $update;
+	private $where, $select, $merge, $update;
+	private $delete = false;
+	private $last_indexes = [];
+	private $order_by = [];
+	const ASC = 1;
+	const DESC = 0;
 
 	private function check_file() {
 		/**
@@ -63,6 +68,9 @@ class JSONDB {
 
 		// Reset where
 		$this->where( [] );
+
+		// Reset order by
+		$this->order_by = [];
 
 		if( $this->check_file() ) {
 			$this->content = ( array ) json_decode( file_get_contents( $this->file ) );
@@ -240,8 +248,35 @@ class JSONDB {
 		}
 		return $r;
 	}	
-	
-	
+
+	public function to_xml( $from, $to ) {
+		$this->from( $from );
+		if( $this->content ) {
+			$element = pathinfo( $from, PATHINFO_FILENAME );
+			$xml = '
+			<?xml version="1.0"?>
+				<' . $element . '>
+';
+			
+			foreach( $this->content as $index => $value ) {
+				$xml .= '
+				<DATA>';
+				foreach( $value as $col => $val ) {
+					$xml .= sprintf( '
+					<%s>%s</%s>', $col, $val, $col );
+				}
+				$xml .= '
+				</DATA>
+				';
+			}
+			$xml .= '</' . $element . '>';
+
+			$xml = trim( $xml );
+			file_put_contents( $to, $xml );
+			return true;
+		}
+		return false;
+	}
 	
 	public function to_mysql( $from, $to, $create_table = true ) {
 		$this->from( $from );
@@ -299,6 +334,48 @@ CREATE TABLE `" . $table . "`
 		return $return;
 	}
 
+	public function order_by( $column, $order = self::ASC ) {
+		$this->order_by = [ $column, $order ];
+		return $this;
+	}
+
+	private function _process_order_by( $content ) {
+		if( $this->order_by && $content && in_array( $this->order_by[ 0 ], array_keys( ( array ) $content[ 0 ] ) ) ) {
+			/*
+				* Check if order by was specified
+				* Check if there's actually a result of the query
+				* Makes sure the column  actually exists in the list of columns
+			*/
+
+			list( $sort_column, $order_by ) = $this->order_by;
+			$sort_keys = [];
+			$sorted = [];
+
+			foreach( $content as $index => $value ) {
+				$value = ( array ) $value;
+				// Save the index and value so we can use them to sort
+				$sort_keys[ $index ] = $value[ $sort_column ];
+			}
+			
+			// Let's sort!
+			if( $order_by == self::ASC ) {
+				asort( $sort_keys );
+			}
+			elseif( $order_by == self::DESC ) {
+				arsort( $sort_keys );
+			}
+
+			// We are done with sorting, lets use the sorted array indexes to pull back the original content and return new content
+			foreach( $sort_keys as $index => $value ) {
+				$sorted[ $index ] = ( array ) $content[ $index ];
+			}
+
+			$content = $sorted;
+		}
+
+		return $content;
+	}
+
 	public function get() {
 		if($this->where != null) {
 			$content = $this->where_result();
@@ -318,9 +395,12 @@ CREATE TABLE `" . $table . "`
 						continue;
 				}
 			}
-			return $r;
+			$content = $r;
 		}
-		else 
-			return $content;
+
+		// Finally, lets do sorting :)
+		$content = $this->_process_order_by( $content );
+		
+		return $content;
 	}
 } 
