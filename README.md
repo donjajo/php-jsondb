@@ -6,7 +6,7 @@ Include the file `<?php include( 'JSONDB.Class.php' );?>`
 #### Initialize
 ```php
 	<?php 
-	$json_db = new JSONDB();
+	$json_db = new JSONDB(); // Or passing the directory of your json files with no trailing slash, default is the current directory. E.g.  new JSONDB( '/var/www/html/json_files' )
 ```
 
 #### Inserting

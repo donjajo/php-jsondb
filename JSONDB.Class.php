@@ -69,7 +69,7 @@ class JSONDB {
 		 * @return type object
 		*/
 
-		$this->file = $this->dir ? sprintf( '%s/%s.json', $this->dir, str_replace( '.json', '', $file ) ) : $file;
+		$this->file = sprintf( '%s/%s.json', $this->dir, str_replace( '.json', '', $file ) ); // Adding .json extension is no longer necessary
 
 		// Reset where
 		$this->where( [] );
