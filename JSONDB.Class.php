@@ -5,8 +5,13 @@ class JSONDB {
 	private $delete = false;
 	private $last_indexes = [];
 	private $order_by = [];
+	protected $dir;
 	const ASC = 1;
 	const DESC = 0;
+
+	public function __construct( $dir = __DIR__ ) {
+		$this->dir = $dir;
+	}
 
 	private function check_file() {
 		/**
@@ -64,7 +69,7 @@ class JSONDB {
 		 * @return type object
 		*/
 
-		$this->file = $file;
+		$this->file = $this->dir ? sprintf( '%s/%s.json', $this->dir, str_replace( '.json', '', $file ) ) : $file;
 
 		// Reset where
 		$this->where( [] );

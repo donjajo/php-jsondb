@@ -16,8 +16,7 @@ $json_db->from( 'users.json' );
 		
 
 $rows = $json_db->order_by( 'name', JSONDB::ASC )->get();
-
-foreach ($rows as $row) {
-	print_r($row);
-	echo "<br>";
-}
+?>
+<pre>
+	<?php print_r( $rows );?>
+</pre>
