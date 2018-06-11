@@ -2,11 +2,12 @@
 A PHP Class that reads JSON file as a database. Use for sample DBs.
 
 ### Usage
-Include the file `<?php include( 'JSONDB.Class.php' );?>`
+Include the file `composer require jajo/jsondb`
 #### Initialize
 ```php
 	<?php 
-	$json_db = new JSONDB(); // Or passing the directory of your json files with no trailing slash, default is the current directory. E.g.  new JSONDB( '/var/www/html/json_files' )
+	use Jajo\JSONDB;
+	$json_db = new JSONDB( __DIR__ ); // Or passing the directory of your json files with no trailing slash, default is the current directory. E.g.  new JSONDB( '/var/www/html/json_files' )
 ```
 
 #### Inserting

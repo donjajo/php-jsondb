@@ -12,7 +12,7 @@ class JSONDB {
 	const ASC = 1;
 	const DESC = 0;
 
-	public function __construct( $dir = __DIR__ ) {
+	public function __construct( $dir ) {
 		$this->dir = $dir;
 	}
 
