@@ -1,0 +1,21 @@
+{
+    "name": "jajo/jsondb",
+    "description": "A PHP Class that reads JSON file as a database. Use for sample DBs",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Jajo",
+            "email": "me@donjajo.com"
+        }
+    ],
+    "autoload" : {
+        "psr-4" : {
+            "Jajo\\" : "src/"
+        }
+    },
+    "require": {},
+    "require-dev": {
+        "phpunit/phpunit": "^7"
+    }
+}

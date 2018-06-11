@@ -1,4 +1,7 @@
 <?php 
+declare( strict_types = 1 );
+namespace Jajo;
+
 class JSONDB {
 	public $file, $content = [];
 	private $where, $select, $merge, $update;
@@ -31,12 +34,12 @@ class JSONDB {
 
 		// Check if its arrays of jSON
 		if( !is_array( $content ) && is_object( $content ) ) {
-			throw new Exception( 'An array of json is required: Json data enclosed with []' );
+			throw new \Exception( 'An array of json is required: Json data enclosed with []' );
 			return false;
 		}
 		// An invalid jSON file
 		elseif( !is_array( $content ) && !is_object( $content ) ) {
-			throw new Exception( 'json is invalid' );
+			throw new \Exception( 'json is invalid' );
 			return false;
 		}
 		else
@@ -99,7 +102,7 @@ class JSONDB {
 		return $this;
 	}
 
-	public function insert( $file, array $values ) {
+	public function insert( $file, array $values ) : array {
 		$this->from( $file );
 
 		if( !empty( $this->content[ 0 ] ) ) {
@@ -164,12 +167,11 @@ class JSONDB {
 		if( $this->delete ) {
 			if( !empty( $this->last_indexes ) && !empty( $this->where ) ) {
 				$this->content = array_map( function( $index, $value ) {
-					if( in_array( $index, $this->last_indexes ) ) 
-						return false;
-					else 
+					if( !in_array( $index, $this->last_indexes ) ) 
 						return $value;
 				}, array_keys( $this->content ), $this->content );
 				$this->content = array_filter( $this->content );
+				//$this->content = array_values( $this->content );
 			}
 			elseif( empty( $this->where ) && empty( $this->last_indexes ) ) {
 				$this->content = array();
