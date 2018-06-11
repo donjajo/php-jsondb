@@ -20,9 +20,10 @@ Insert into your new JSON file. Using *users.json* as example here
 $json_db->insert( 'users.json', 
 	[ 
 		'name' => 'Thomas', 
-			'state' => 'Nigeria', 
-			'age' => 22 
-]);
+		'state' => 'Nigeria', 
+		'age' => 22 
+	]
+);
 ```
 
 #### Get 
