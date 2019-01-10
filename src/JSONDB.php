@@ -76,6 +76,7 @@ class JSONDB {
 
 		// Reset where
 		$this->where( [] );
+		$this->content = '';
 
 		// Reset order by
 		$this->order_by = [];
