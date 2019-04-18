@@ -9,11 +9,13 @@ class JSONDB {
 	private $last_indexes = [];
 	private $order_by = [];
 	protected $dir;
+	private $json_opts = [];
 	const ASC = 1;
 	const DESC = 0;
 
-	public function __construct( $dir ) {
+	public function __construct( $dir, $json_encode_opt = JSON_UNESCAPED_UNICODE|JSON_PRETTY_PRINT ) {
 		$this->dir = $dir;
+		$this->json_opts[ 'encode' ] = $json_encode_opt;
 	}
 
 	private function check_file() {
@@ -129,7 +131,7 @@ class JSONDB {
 
 	public function commit() {
 		$f = fopen( $this->file, 'w+' );
-		fwrite( $f, ( !$this->content ? '[]' : json_encode( $this->content ) ) );
+		fwrite( $f, ( !$this->content ? '[]' : json_encode( $this->content, $this->json_opts[ 'encode' ] ) ) );
 		fclose( $f );
 	}
 

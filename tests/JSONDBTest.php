@@ -13,7 +13,7 @@ class InsertTest extends TestCase {
 
 	public function testInsert() : void {
 		$this->load_db();
-		$names = [ 'James', 'John', 'Oji', 'Okeke', 'Bola', 'Thomas', 'Ibrahim', 'Smile' ];
+		$names = [ 'James£', 'John£', 'Oji£', 'Okeke£', 'Bola', 'Thomas', 'Ibrahim', 'Smile' ];
 		$states = [ 'Abia', 'Lagos', 'Benue', 'Kano', 'Kastina', 'Abuja', 'Imo', 'Ogun' ];
 		shuffle( $names );
 		shuffle( $states );
@@ -34,7 +34,7 @@ class InsertTest extends TestCase {
 
 	public function testGet() : void {
 		$this->load_db();
-
+		printf( "\nCheck exist\n" );
 		$users = ( $this->db->select( '*' )
 			->from( 'users' )
 			->get() );
