@@ -13,7 +13,7 @@ class InsertTest extends TestCase {
 
 	public function testInsert() : void {
 		$this->load_db();
-		$names = [ 'James£', 'John£', 'Oji£', 'Okeke£', 'Bola', 'Thomas', 'Ibrahim', 'Smile' ];
+		$names = [ 'James£', 'John£', 'Oji£', 'Okeke', 'Bola', 'Thomas', 'Ibrahim', 'Smile' ];
 		$states = [ 'Abia', 'Lagos', 'Benue', 'Kano', 'Kastina', 'Abuja', 'Imo', 'Ogun' ];
 		shuffle( $names );
 		shuffle( $states );
@@ -30,6 +30,12 @@ class InsertTest extends TestCase {
 		]);
 
 		$this->assertArrayHasKey( 0, $indexes );
+
+		$this->db->insert( "users", array(
+			"name" => "Dummy",
+			"state" => "Lagos",
+			"age" => 12
+		));
 	}
 
 	public function testGet() : void {
@@ -74,21 +80,10 @@ class InsertTest extends TestCase {
 			->from( 'users' )
 			->where([ 'name' => 'Okeke' ])
 			->trigger();
-
-		$result = $this->db->select( '*' )
-			->from( 'users' )
-			->where([ 'name' => 'Jammy' ])
-			->get();
-
-		$this->assertTrue( $result[ 0 ][ 'state' ] == 'Sokoto' && $result[ 0 ][ 'name' ] == 'Jammy' );
-	}
-
-	public function testDelete() : void {
-		$this->load_db();
-
-		$this->db->delete()
-			->from( 'users' )
-			->where([ 'name' => 'Jammy' ])
+		
+		$this->db->update([ "state" => "Rivers"])
+			->from( "users" )
+			->where([ "name" => "Dummy" ])
 			->trigger();
 
 		$result = $this->db->select( '*' )
@@ -96,6 +91,23 @@ class InsertTest extends TestCase {
 			->where([ 'name' => 'Jammy' ])
 			->get();
 
-		$this->assertEmpty( $result );
+		$this->assertTrue( $result[ 0 ][ 'state' ] == 'Sokoto' && $result[ 0 ][ 'name' ] == 'Jammy' );
+
 	}
+
+	// public function testDelete() : void {
+	// 	$this->load_db();
+
+	// 	$this->db->delete()
+	// 		->from( 'users' )
+	// 		->where([ 'name' => 'Jammy' ])
+	// 		->trigger();
+
+	// 	$result = $this->db->select( '*' )
+	// 		->from( 'users' )
+	// 		->where([ 'name' => 'Jammy' ])
+	// 		->get();
+
+	// 	$this->assertEmpty( $result );
+	// }
 }

@@ -105,6 +105,14 @@ class JSONDB {
 		return $this;
 	}
 
+	/**
+	 * Inserts data into json file
+	 * 
+	 * @param string $file json filename without extension
+	 * @param array $values Array of columns as keys and values
+	 * 
+	 * @return array $last_indexes Array of last index inserted
+	 */
 	public function insert( $file, array $values ) : array {
 		$this->from( $file );
 
@@ -164,6 +172,11 @@ class JSONDB {
 		}
 	}
 
+	/**
+	 * Prepares data and written to file
+	 * 
+	 * @return object $this 
+	 */
 	public function trigger() {
 		$content = ( !empty( $this->where ) ? $this->where_result() : $this->content );
 		$return = false;
@@ -193,10 +206,22 @@ class JSONDB {
 		return $this;
 	}
 
+	/**
+	 * Flushes indexes they won't be reused on next action
+	 * 
+	 * @return object $this 
+	 */
+	private function flush_indexes() {
+		$this->last_indexes = array();
+	}
+
+	/**
+	 * Validates and fetch out the data for manipulation
+	 * 
+	 * @return array $r Array of rows matching WHERE
+	 */
 	private function where_result() {
-		/*
-			Validates the where statement values
-		*/
+		$this->flush_indexes();
 
 		if( $this->merge == 'AND' ) {
 			return $this->where_and_result();
@@ -231,7 +256,11 @@ class JSONDB {
 		}
 	}
 
-	
+	/**
+	 * Validates and fetch out the data for manipulation for AND
+	 * 
+	 * @return array $r Array of fetched WHERE statement
+	 */
 	private function where_and_result() {
 		/*
 			Validates the where statement values

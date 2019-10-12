@@ -1,17 +1,27 @@
 [
     {
-        "name": "Ibrahim",
-        "state": "Benue",
-        "age": 74
+        "name": "Jammy",
+        "state": "Sokoto",
+        "age": 93
+    },
+    {
+        "name": "Dummy",
+        "state": "Rivers",
+        "age": 12
     },
     {
         "name": "Smile",
-        "state": "Abuja",
-        "age": 92
+        "state": "Kano",
+        "age": 94
     },
     {
-        "name": "Okeke£",
-        "state": "Abia",
-        "age": 93
+        "name": "Dummy",
+        "state": "Rivers",
+        "age": 12
+    },
+    {
+        "name": "Jammy",
+        "age": 21,
+        "state": "Sokoto"
     }
 ]
