@@ -110,11 +110,16 @@ class JSONDB {
 	 * 
 	 * @param string $file json filename without extension
 	 * @param array $values Array of columns as keys and values
+	 * @param bool $_id Generate a unique ID
 	 * 
 	 * @return array $last_indexes Array of last index inserted
 	 */
-	public function insert( $file, array $values ) : array {
+	public function insert( $file, array $values, $_id = true ) : array {
 		$this->from( $file );
+
+		if( $_id ) {
+			$values['_id'] = uniqid( '', false );
+		}
 
 		if( !empty( $this->content[ 0 ] ) ) {
 			$nulls = array_diff_key( ( array ) $this->content[ 0 ], $values );
