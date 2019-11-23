@@ -95,19 +95,19 @@ class InsertTest extends TestCase {
 
 	}
 
-	// public function testDelete() : void {
-	// 	$this->load_db();
+	public function testDelete() : void {
+		$this->load_db();
 
-	// 	$this->db->delete()
-	// 		->from( 'users' )
-	// 		->where([ 'name' => 'Jammy' ])
-	// 		->trigger();
+		$this->db->delete()
+			->from( 'users' )
+			->where([ 'name' => 'Jammy' ])
+			->trigger();
 
-	// 	$result = $this->db->select( '*' )
-	// 		->from( 'users' )
-	// 		->where([ 'name' => 'Jammy' ])
-	// 		->get();
+		$result = $this->db->select( '*' )
+			->from( 'users' )
+			->where([ 'name' => 'Jammy' ])
+			->get();
 
-	// 	$this->assertEmpty( $result );
-	// }
+		$this->assertEmpty( $result );
+	}
 }

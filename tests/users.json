@@ -1,8 +1,8 @@
 [
     {
-        "name": "Jammy",
-        "state": "Sokoto",
-        "age": 93
+        "name": "John£",
+        "state": "Abia",
+        "age": 53
     },
     {
         "name": "Dummy",
@@ -10,9 +10,9 @@
         "age": 12
     },
     {
-        "name": "Smile",
-        "state": "Kano",
-        "age": 94
+        "name": "James£",
+        "state": "Abia",
+        "age": 31
     },
     {
         "name": "Dummy",
@@ -20,8 +20,13 @@
         "age": 12
     },
     {
-        "name": "Jammy",
-        "age": 21,
-        "state": "Sokoto"
+        "name": "Oji£",
+        "state": "Kastina",
+        "age": 84
+    },
+    {
+        "name": "Dummy",
+        "state": "Rivers",
+        "age": 12
     }
 ]

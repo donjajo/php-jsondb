@@ -182,12 +182,11 @@ class JSONDB {
 		$return = false;
 		if( $this->delete ) {
 			if( !empty( $this->last_indexes ) && !empty( $this->where ) ) {
-				$this->content = array_map( function( $index, $value ) {
-					if( !in_array( $index, $this->last_indexes ) ) 
-						return $value;
-				}, array_keys( $this->content ), $this->content );
-				$this->content = array_filter( $this->content );
-				//$this->content = array_values( $this->content );
+				$this->content = array_filter($this->content, function( $index ) {
+					return !in_array( $index, $this->last_indexes );
+				}, ARRAY_FILTER_USE_KEY );
+	
+				$this->content = array_values( $this->content );
 			}
 			elseif( empty( $this->where ) && empty( $this->last_indexes ) ) {
 				$this->content = array();
