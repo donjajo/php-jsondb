@@ -110,4 +110,18 @@ class InsertTest extends TestCase {
 
 		$this->assertEmpty( $result );
 	}
+
+	public function testDeleteAll() : void {
+		$this->load_db();
+
+		$this->db->delete()
+			->from( 'users' )
+			->trigger();
+
+		$result = $this->db->select( '*' )
+			->from( 'users' )
+			->get();
+
+		$this->assertEmpty( $result );
+	}
 }
