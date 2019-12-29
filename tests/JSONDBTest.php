@@ -113,7 +113,18 @@ class InsertTest extends TestCase {
 
 	public function testDeleteAll() : void {
 		$this->load_db();
+		
+		/* I add a select action with where statement */
+		$result_before = $this->db->select( '*' )
+			->from( 'users' )
+			->where([ 'state' => 'Rivers' ])
+			->get();
+		
+		/* Select action works fine */
+		printf("\nCount of select action's result : ".count($result_before));
+		$this->assertTrue( $result_before[ 0 ][ 'name' ] == 'Dummy');
 
+		/* Original test code by donjajo */
 		$this->db->delete()
 			->from( 'users' )
 			->trigger();
@@ -122,6 +133,7 @@ class InsertTest extends TestCase {
 			->from( 'users' )
 			->get();
 
+		/* But delete all action not working and assertion fail*/
 		$this->assertEmpty( $result );
 	}
 }
