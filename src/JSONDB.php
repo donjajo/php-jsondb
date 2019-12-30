@@ -210,8 +210,10 @@ class JSONDB {
 	 * 
 	 * @return object $this 
 	 */
-	private function flush_indexes() {
+	private function flush_indexes( $flush_where = false ) {
 		$this->last_indexes = array();
+		if( $flush_where )
+			$this->where = array();
 	}
 
 	/**
@@ -439,6 +441,7 @@ CREATE TABLE `" . $table . "`
 		// Finally, lets do sorting :)
 		$content = $this->_process_order_by( $content );
 		
+		$this->flush_indexes( true );
 		return $content;
 	}
 } 

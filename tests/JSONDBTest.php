@@ -121,7 +121,7 @@ class InsertTest extends TestCase {
 			->get();
 		
 		/* Select action works fine */
-		printf("\nCount of select action's result : ".count($result_before));
+		printf("\nCount of select action's result : %d", count($result_before) );
 		$this->assertTrue( $result_before[ 0 ][ 'name' ] == 'Dummy');
 
 		/* Original test code by donjajo */
