@@ -2,6 +2,13 @@
 declare( strict_types = 1 );
 namespace Jajo;
 
+class JSONDBLike {
+	public $value;
+	public function __construct($val) {
+		$this->value = $val;
+	}
+}
+
 class JSONDB {
 	public $file, $content = [];
 	private $where, $select, $merge, $update;
@@ -87,6 +94,10 @@ class JSONDB {
 			$this->content = ( array ) json_decode( file_get_contents( $this->file ) );
 		}
 		return $this;
+	}
+	
+	public static function like($val) {
+		return new JSONDBLike($val);
 	}
 
 	public function where( array $columns, $merge = 'OR' ) {
@@ -223,7 +234,6 @@ class JSONDB {
 	 */
 	private function where_result() {
 		$this->flush_indexes();
-
 		if( $this->merge == 'AND' ) {
 			return $this->where_and_result();
 		}
@@ -232,7 +242,6 @@ class JSONDB {
 
 			// Loop through the existing values. Ge the index and row
 			foreach( $this->content as $index => $row ) {
-
 				// Make sure its array data type
 				$row = ( array ) $row;
 
@@ -240,16 +249,33 @@ class JSONDB {
 				foreach( $row as $column => $value ) {
 					// If each of the column is provided in the where statement
 					if( in_array( $column, array_keys( $this->where ) ) ) {
-						// To be sure the where column value and existing row column value matches
-						if( $this->where[ $column ] == $row[ $column ] ) {
-							// Append all to be modified row into a array variable
-							$r[] = $row;
-
-							// Append also each row array key
-							$this->last_indexes[] = $index;
+						// Check where object and row object coincide "Like" comparison situation
+						if(is_object($this->where[$column]) && is_string($row[ $column ])) {
+							// Check where's condition object is our Like object
+							if (get_class($this->where[$column]) == "Jajo\JSONDBLike") {
+								// Check row data contains Like obejct's string
+								if( strpos($row[ $column ], $this->where[ $column ]->value) !== false ) {
+									// Append all to be modified row into a array variable
+									$r[] = $row;
+		
+									// Append also each row array key
+									$this->last_indexes[] = $index;
+								}
+								else 
+									continue;
+							}
+						} else {
+							// To be sure the where column value and existing row column value matches
+							if( $this->where[ $column ] == $row[ $column ] ) {
+								// Append all to be modified row into a array variable
+								$r[] = $row;
+	
+								// Append also each row array key
+								$this->last_indexes[] = $index;
+							}
+							else 
+								continue;
 						}
-						else 
-							continue;
 					}
 				}
 			}
