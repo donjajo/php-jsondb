@@ -37,11 +37,19 @@ class WhereTest extends TestCase {
 				->from( 'pets' )
 				->where([ 
 				    'kind' => 'rodentia',
-				    'age' => 1
+				    'age' => 0
 				])->get()
 			);
-		var_dump($result);
-		$this->assertCount(4, $result);
+		$this->assertCount(5, $result);
+		
+		$result = ( $this->db->select( '*' )
+				->from( 'pets' )
+				->where([ 
+				    'kind' => 'squamata',
+				    'age' => 2
+				])->get()
+			);
+		$this->assertCount(2, $result);
 	}
 }
 ?>
