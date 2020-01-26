@@ -72,32 +72,6 @@ class InsertTest extends TestCase {
 	
 		$this->assertEquals( 'Okeke', $result[ 0 ][ 'name' ] );
 	}
-	
-	public function testWhereLike() : void {
-		$this->load_db();
-
-		$result = ( $this->db->select( '*' )
-				->from( 'users' )
-				->where([ 'name' => JSONDB::like("J") ])
-				->get()
-			);
-			
-		if( !$result ) {
-			$this->db->insert( 'users', [
-				'name' => 'John',
-				'age' => 28,
-				'state' => 'Ibadan'
-			]);
-
-			$result = ( $this->db->select( '*' )
-				->from( 'users' )
-				->where([ 'name' => JSONDB::like("J") ], 'AND')
-				->get()
-			);
-		}
-		
-		$this->assertCount(1, $result);
-	}
 
 	public function testUpdate() : void {
 		$this->load_db();
