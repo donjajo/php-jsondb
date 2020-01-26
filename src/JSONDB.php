@@ -99,6 +99,15 @@ class JSONDB {
 	public static function like($val) {
 		return new JSONDBLike($val);
 	}
+	
+	public static function is_like($val): bool {
+		if (is_object($val)) {
+			if (get_class($val) == "Jajo\JSONDBLike") {
+				return true;
+			}
+		}
+		return false;
+	}
 
 	public function where( array $columns, $merge = 'OR' ) {
 		$this->where = $columns;
@@ -238,8 +247,6 @@ class JSONDB {
 			return $this->where_and_result();
 		}
 		else {
-			$r = [];
-
 			// Loop through the existing values. Ge the index and row
 			foreach( $this->content as $index => $row ) {
 				// Make sure its array data type
@@ -250,9 +257,7 @@ class JSONDB {
 					// If each of the column is provided in the where statement
 					if( in_array( $column, array_keys( $this->where ) ) ) {
 						// Check where object and row object coincide "Like" comparison situation
-						if(is_object($this->where[$column]) && is_string($row[ $column ])) {
-							// Check where's condition object is our Like object
-							if (get_class($this->where[$column]) == "Jajo\JSONDBLike") {
+						if(self::is_like($this->where[$column]) && is_string($row[ $column ])) {
 								// Check row data contains Like obejct's string
 								if( strpos($row[ $column ], $this->where[ $column ]->value) !== false ) {
 									// Append all to be modified row into a array variable
@@ -263,7 +268,6 @@ class JSONDB {
 								}
 								else 
 									continue;
-							}
 						} else {
 							// To be sure the where column value and existing row column value matches
 							if( $this->where[ $column ] == $row[ $column ] ) {
@@ -302,7 +306,33 @@ class JSONDB {
 
 			
 			//check if the row = where['col'=>'val', 'col2'=>'val2']
-			if(!array_diff($this->where,$row)) {
+			if(!array_udiff($this->where,$row, function($a, $b) {
+				if (is_string($a) and self::is_like($b)) {
+					if (strpos($a, $b->value) !== false) {
+						return 0;
+					} else if ($a > $b->value) {
+						return 1;
+					} else {
+						return -1;
+					}
+				} else if (is_string($b) and self::is_like($a)) {
+					if (strpos($b, $a->value) !== false) {
+						return 0;
+					} else if ($b > $a->value) {
+						return 1;
+					} else {
+						return -1;
+					}
+				} else {
+					if ($a == $b) {
+						return 0;
+					} else if ($a > $b) {
+						return 1;
+					} else {
+						return -1;
+					}
+				}
+			})) {
 				$r[] = $row;
 				// Append also each row array key
 				$this->last_indexes[] = $index;			
