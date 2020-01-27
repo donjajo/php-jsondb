@@ -223,13 +223,12 @@ class JSONDB {
 	 */
 	private function where_result() {
 		$this->flush_indexes();
-		
+
 		if( $this->merge == 'AND' ) {
 			return $this->where_and_result();
 		}
 		else {
 			$r = [];
-			$r_idx = [];
 
 			// Loop through the existing values. Ge the index and row
 			foreach( $this->content as $index => $row ) {
@@ -243,15 +242,11 @@ class JSONDB {
 					if( in_array( $column, array_keys( $this->where ) ) ) {
 						// To be sure the where column value and existing row column value matches
 						if( $this->where[ $column ] == $row[ $column ] ) {
-							// Only append row to result when this row never been appended
-							if( array_search($index, $r_idx) === false ) {
-								// Append all to be modified row into a array variable
-								$r[] = $row;
-								// Append row's index for preventing duplicated row
-								$r_idx[] = $index;
-								// Append also each row array key
-								$this->last_indexes[] = $index;
-							}
+							// Append all to be modified row into a array variable
+							$r[] = $row;
+
+							// Append also each row array key
+							$this->last_indexes[] = $index;
 						}
 						else 
 							continue;
