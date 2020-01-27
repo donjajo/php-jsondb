@@ -224,36 +224,25 @@ class JSONDB {
 	private function where_result() {
 		$this->flush_indexes();
 
-		if( $this->merge == 'AND' ) {
+		if( $this->merge == "AND" ) {
 			return $this->where_and_result();
 		}
 		else {
-			$r = [];
-
-			// Loop through the existing values. Ge the index and row
-			foreach( $this->content as $index => $row ) {
-
-				// Make sure its array data type
-				$row = ( array ) $row;
-
-				// Loop again through each row,  get columns and values
-				foreach( $row as $column => $value ) {
-					// If each of the column is provided in the where statement
-					if( in_array( $column, array_keys( $this->where ) ) ) {
-						// To be sure the where column value and existing row column value matches
-						if( $this->where[ $column ] == $row[ $column ] ) {
-							// Append all to be modified row into a array variable
-							$r[] = $row;
-
-							// Append also each row array key
-							$this->last_indexes[] = $index;
-						}
-						else 
-							continue;
-					}
+			// Filter array
+			$r = array_filter($this->content, function( $row, $index ) {
+				$row = (array) $row; // Convert first stage to array if object
+				
+				// Check for rows intersecting with the where values.
+				if( array_intersect_assoc( $row, $this->where ) ) {
+					$this->last_indexes[] =  $index;
+					return true;
 				}
-			}
-			return $r;
+
+				return false;
+			}, ARRAY_FILTER_USE_BOTH );
+			
+			// Make sure every  object is turned to array here.
+			return array_values( obj_to_array( $r ) );
 		}
 	}
 

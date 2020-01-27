@@ -12,7 +12,10 @@
     "autoload" : {
         "psr-4" : {
             "Jajo\\" : "src/"
-        }
+        },
+        "files" : [
+            "helpers/dataTypes.php"
+        ]
     },
     "require": {},
     "require-dev": {

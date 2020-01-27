@@ -73,6 +73,25 @@ class InsertTest extends TestCase {
 		$this->assertEquals( 'Okeke', $result[ 0 ][ 'name' ] );
 	}
 
+	public function testMultiWhere() : void {
+		$this->load_db();
+
+		$this->db->insert( "users", array(
+			"name" => "Jajo",
+			"age" => null,
+			"state" => "Lagos"
+		));
+
+		$this->db->insert( "users", array(
+			"name" => "Johnny",
+			"age" => 30,
+			"state" => "Ogun"
+		));
+
+		$result = $this->db->select( "*" )->from( "users" )->where( array( "age" => null, "name" => "Jajo" ) )->get();
+		$this->assertEquals( 'Jajo', $result[ 0 ][ 'name' ] );
+	}
+
 	public function testUpdate() : void {
 		$this->load_db();
 
