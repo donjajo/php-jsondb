@@ -3,6 +3,7 @@
     "description": "A PHP Class that reads JSON file as a database. Use for sample DBs",
     "type": "library",
     "license": "MIT",
+    "version" :  "1.5",
     "authors": [
         {
             "name": "Jajo",
