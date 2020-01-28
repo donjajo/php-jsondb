@@ -11,6 +11,7 @@ class WhereTest extends TestCase {
 		$this->db = new JSONDB( __DIR__ );
 	}
 	
+	// Both 'setUp' and 'tearDown' function is called by phpunit per every test function before test function is called
 	public function setUp() {
 	    $this->load_db();
 	    
