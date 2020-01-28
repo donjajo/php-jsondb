@@ -70,7 +70,7 @@ class WhereTest extends TestCase {
 			);
 		$this->assertCount(1, $result);
 		$this->assertEquals('catoblepas', $result[ 0 ][ 'name' ] );
-		$this->assertEquals( null, $result[ 0 ][ 'kind' ] );
+		$this->assertSame( null, $result[ 0 ][ 'kind' ] );
 	}
 	
 }
