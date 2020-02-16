@@ -2,13 +2,18 @@
 declare( strict_types = 1 );
 namespace Jajo;
 
+// Data container for using 'LIKE' statement in JSONDB 
+// Currently, support only searching if given condition string is just contained in rows. 
+// (equal to '%<value>%' in sql, doesn't support wildcard)
 class JSONDBLike {
-	public $value;
+	public $value; //LIKE statement's condition value 
 	
 	public function __construct($val) {
 		$this->value = $val;
 	}
 	
+	// Compare if two parameters is same.
+	// Expect both parameter as mixed type.
 	public static function compare($a, $b): int {
 		$ra = self::is_like($a) ? $a->value : $a;
 		$rb = self::is_like($b) ? $b->value : $b;
@@ -21,6 +26,8 @@ class JSONDBLike {
 		}
 	}
 	
+	// Distinguish whether $full string contains $sub string.
+	// Expect both parameter as string or JSONDBLike object.
 	public static function contain($full, $sub): bool {
 		$rf = self::is_like($full) ? $full->value : $full;
 		$rs = self::is_like($sub) ? $sub->value : $sub;
@@ -31,6 +38,7 @@ class JSONDBLike {
 		}
 	}
 	
+	// Distinguish whether given parameter is JSONDBLike object.
 	public static function is_like($val): bool {
 		if (is_object($val)) {
 			if (get_class($val) == "Jajo\JSONDBLike") {
@@ -40,6 +48,8 @@ class JSONDBLike {
 		return false;
 	}
 	
+	// Distinguish whether given parameter is JSONDBLike object or string.
+	// Only those two types can be parameter of contain function.
 	public static function is_likeable($a, $b): bool {
 		return (JSONDBLike::is_like($a) or is_string($a)) and (JSONDBLike::is_like($b) or is_string($b));
 	}
@@ -132,6 +142,7 @@ class JSONDB {
 		return $this;
 	}
 	
+	// Proxy of JSONDBLike constructor
 	public static function like($val) {
 		return new JSONDBLike($val);
 	}
@@ -281,6 +292,7 @@ class JSONDB {
 				
 				// Check for rows intersecting with the where values.
 				if( array_uintersect_uassoc( $row, $this->where, function($a, $b) {
+					// If given condition is JSONDBLike object, process and search it as LIKE statement.
 					if (JSONDBLike::is_likeable($a, $b)) {
 						return (JSONDBLike::contain($a, $b) or JSONDBLike::contain($b, $a)) ? 0 : 1;
 					} else {
@@ -319,6 +331,7 @@ class JSONDB {
 			
 			//check if the row = where['col'=>'val', 'col2'=>'val2']
 			if(!array_udiff($this->where,$row, function($a, $b) {
+				// If given condition is JSONDBLike object, process and search it as LIKE statement.
 				if (JSONDBLike::is_likeable($a, $b)) {
 						return (JSONDBLike::contain($a, $b) or JSONDBLike::contain($b, $a)) ? 0 : 1;
 					} else {
