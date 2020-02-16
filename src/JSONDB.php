@@ -4,8 +4,44 @@ namespace Jajo;
 
 class JSONDBLike {
 	public $value;
+	
 	public function __construct($val) {
 		$this->value = $val;
+	}
+	
+	public static function compare($a, $b): int {
+		$ra = self::is_like($a) ? $a->value : $a;
+		$rb = self::is_like($b) ? $b->value : $b;
+		if ($ra === $rb) {
+			return 0;
+		} else if ($ra > $rb) {
+			return 1;
+		} else {
+			return -1;
+		}
+	}
+	
+	public static function contain($full, $sub): bool {
+		$rf = self::is_like($full) ? $full->value : $full;
+		$rs = self::is_like($sub) ? $sub->value : $sub;
+		if (strpos($rf, $rs) !== false) {
+    		return true;
+		} else {
+			return false;
+		}
+	}
+	
+	public static function is_like($val): bool {
+		if (is_object($val)) {
+			if (get_class($val) == "Jajo\JSONDBLike") {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public static function is_likeable($a, $b): bool {
+		return (JSONDBLike::is_like($a) or is_string($a)) and (JSONDBLike::is_like($b) or is_string($b));
 	}
 }
 
@@ -98,15 +134,6 @@ class JSONDB {
 	
 	public static function like($val) {
 		return new JSONDBLike($val);
-	}
-	
-	public static function is_like($val): bool {
-		if (is_object($val)) {
-			if (get_class($val) == "Jajo\JSONDBLike") {
-				return true;
-			}
-		}
-		return false;
 	}
 
 	public function where( array $columns, $merge = 'OR' ) {
@@ -243,47 +270,32 @@ class JSONDB {
 	 */
 	private function where_result() {
 		$this->flush_indexes();
-		if( $this->merge == 'AND' ) {
+
+		if( $this->merge == "AND" ) {
 			return $this->where_and_result();
 		}
 		else {
-			// Loop through the existing values. Ge the index and row
-			foreach( $this->content as $index => $row ) {
-				// Make sure its array data type
-				$row = ( array ) $row;
-
-				// Loop again through each row,  get columns and values
-				foreach( $row as $column => $value ) {
-					// If each of the column is provided in the where statement
-					if( in_array( $column, array_keys( $this->where ) ) ) {
-						// Check where object and row object coincide "Like" comparison situation
-						if(self::is_like($this->where[$column]) && is_string($row[ $column ])) {
-								// Check row data contains Like obejct's string
-								if( strpos($row[ $column ], $this->where[ $column ]->value) !== false ) {
-									// Append all to be modified row into a array variable
-									$r[] = $row;
-		
-									// Append also each row array key
-									$this->last_indexes[] = $index;
-								}
-								else 
-									continue;
-						} else {
-							// To be sure the where column value and existing row column value matches
-							if( $this->where[ $column ] == $row[ $column ] ) {
-								// Append all to be modified row into a array variable
-								$r[] = $row;
-	
-								// Append also each row array key
-								$this->last_indexes[] = $index;
-							}
-							else 
-								continue;
-						}
+			// Filter array
+			$r = array_filter($this->content, function( $row, $index ) {
+				$row = (array) $row; // Convert first stage to array if object
+				
+				// Check for rows intersecting with the where values.
+				if( array_uintersect_uassoc( $row, $this->where, function($a, $b) {
+					if (JSONDBLike::is_likeable($a, $b)) {
+						return (JSONDBLike::contain($a, $b) or JSONDBLike::contain($b, $a)) ? 0 : 1;
+					} else {
+						return JSONDBLike::compare($a, $b);
 					}
+				}, "Jajo\JSONDBLike::compare") ) {
+					$this->last_indexes[] =  $index;
+					return true;
 				}
-			}
-			return $r;
+
+				return false;
+			}, ARRAY_FILTER_USE_BOTH );
+			
+			// Make sure every  object is turned to array here.
+			return array_values( obj_to_array( $r ) );
 		}
 	}
 
@@ -307,30 +319,10 @@ class JSONDB {
 			
 			//check if the row = where['col'=>'val', 'col2'=>'val2']
 			if(!array_udiff($this->where,$row, function($a, $b) {
-				if (is_string($a) and self::is_like($b)) {
-					if (strpos($a, $b->value) !== false) {
-						return 0;
-					} else if ($a > $b->value) {
-						return 1;
+				if (JSONDBLike::is_likeable($a, $b)) {
+						return (JSONDBLike::contain($a, $b) or JSONDBLike::contain($b, $a)) ? 0 : 1;
 					} else {
-						return -1;
-					}
-				} else if (is_string($b) and self::is_like($a)) {
-					if (strpos($b, $a->value) !== false) {
-						return 0;
-					} else if ($b > $a->value) {
-						return 1;
-					} else {
-						return -1;
-					}
-				} else {
-					if ($a == $b) {
-						return 0;
-					} else if ($a > $b) {
-						return 1;
-					} else {
-						return -1;
-					}
+						return JSONDBLike::compare($a, $b);
 				}
 			})) {
 				$r[] = $row;
