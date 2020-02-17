@@ -3,7 +3,7 @@ declare( strict_types = 1 );
 namespace Jajo;
 
 // Data container for using 'LIKE' statement in JSONDB 
-// Currently, support only searching if given condition string is just contained in rows. 
+// Currently, support only searching whether given condition string is just contained in rows. 
 // (equal to '%<value>%' in sql, doesn't support wildcard)
 class JSONDBLike {
 	public $value; //LIKE statement's condition value 
