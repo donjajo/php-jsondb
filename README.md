@@ -87,6 +87,18 @@ $users = $json_db->select( 'name, state'  )
 print_r( $users );
 ```
 
+##### LIKE Statement:
+When passing condition string with JSONDBLike object to where method, the results will be returned which whole rows contain given condition string.
+_Currently, support only searching whether given condition string is just contained in rows. (equal to '%value%' in sql, doesn't support wildcard)_
+	
+```php
+$users = $json_db->select( 'name, state'  )
+	->from( 'users.json' )
+	->where( [ 'name' => JSONDB::like("tho") ] )
+	->get();
+print_r( $users );
+```
+
 #### Updating Row
 You can also update same JSON file with these methods
 ```php
