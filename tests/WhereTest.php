@@ -75,7 +75,6 @@ class WhereTest extends TestCase {
 		$this->assertSame( null, $result[ 0 ][ 'kind' ] );
 	}
 	
-	
 	public function testWhereLike() : void {
 		$result = ( $this->db->select( '*' )
 				->from( 'pets' )
@@ -127,6 +126,5 @@ class WhereTest extends TestCase {
 			);
 		$this->assertEmpty($result);
 	}
-	
 }
 ?>

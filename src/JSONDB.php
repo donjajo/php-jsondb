@@ -299,6 +299,7 @@ class JSONDB {
 						return JSONDBLike::compare($a, $b);
 					}
 				}, "Jajo\JSONDBLike::compare") ) {
+
 					$this->last_indexes[] =  $index;
 					return true;
 				}
