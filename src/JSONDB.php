@@ -10,8 +10,11 @@ class JSONDB {
 	private $order_by = [];
 	protected $dir;
 	private $json_opts = [];
+
 	const ASC = 1;
 	const DESC = 0;
+	const AND = "AND";
+	const OR = "OR";
 
 	public function __construct( $dir, $json_encode_opt = JSON_UNESCAPED_UNICODE|JSON_PRETTY_PRINT ) {
 		$this->dir = $dir;
@@ -93,6 +96,21 @@ class JSONDB {
 		$this->where = $columns;
 		$this->merge = $merge;
 		return $this;
+	}
+
+	/**
+	 * Implements regex search on where statement 
+	 * 
+	 * @param	string	$pattern			Regex pattern
+	 * @param	int		$preg_grep_flags	Flags for preg_grep(). See - https://www.php.net/manual/en/function.preg-match.php
+	 */
+	public static function regex( string $pattern, int $preg_match_flags = 0 ) : object {
+		$c = new \stdClass();
+		$c->is_regex = true;
+		$c->value = $pattern;
+		$c->options = $preg_match_flags;
+
+		return $c;
 	}
 
 	public function delete() {
@@ -216,6 +234,26 @@ class JSONDB {
 			$this->where = array();
 	}
 
+	private function intersect_value_check($a, $b) {
+		if( $b instanceof \stdClass ) {
+			if( $b->is_regex ) {
+				return !preg_match( $b->value, (string)$a, $_, $b->options );
+			}
+
+			return -1;
+		}
+
+		if( $a instanceof \stdClass ) {
+			if( $a->is_regex ) {
+				return !preg_match( $a->value, (string)$b, $_, $a->options );
+			}
+
+			return -1;
+		}
+		
+		return strcasecmp((string)$a, (string)$b);
+	}
+
 	/**
 	 * Validates and fetch out the data for manipulation
 	 * 
@@ -233,11 +271,11 @@ class JSONDB {
 				$row = (array) $row; // Convert first stage to array if object
 				
 				// Check for rows intersecting with the where values.
-				if( array_intersect_assoc( $row, $this->where ) ) {
+				if( array_uintersect_uassoc( $row, $this->where, array($this, "intersect_value_check" ), "strcasecmp" ) /*array_intersect_assoc( $row, $this->where )*/ ) {
 					$this->last_indexes[] =  $index;
 					return true;
 				}
-
+				
 				return false;
 			}, ARRAY_FILTER_USE_BOTH );
 			
@@ -265,7 +303,7 @@ class JSONDB {
 
 			
 			//check if the row = where['col'=>'val', 'col2'=>'val2']
-			if(!array_diff($this->where,$row)) {
+			if(!array_udiff_uassoc($this->where,$row, array($this, "intersect_value_check" ), "strcasecmp" ) ) {
 				$r[] = $row;
 				// Append also each row array key
 				$this->last_indexes[] = $index;			

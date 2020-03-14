@@ -92,6 +92,85 @@ class InsertTest extends TestCase {
 		$this->assertEquals( 'Jajo', $result[ 0 ][ 'name' ] );
 	}
 
+	public function testAND() : void {
+		$this->load_db();
+
+		$this->db->insert( "users", array(
+			"name" => "Jajo",
+			"age" => 50,
+			"state" => "Lagos"
+		));
+
+		$this->db->insert( "users", array(
+			"name" => "Johnny",
+			"age" => 50,
+			"state" => "Ogun"
+		));
+
+		$result = $this->db->select( "*" )->from( "users" )->where( array( "age" => 50, "name" => "Jajo" ), JSONDB::AND )->get();
+
+		$this->assertEquals( 1, count($result) );
+		$this->assertEquals( "Jajo", $result[0][ 'name' ] );
+	}
+
+	public function testRegexAND() : void {
+		$this->load_db();
+
+		$this->db->insert( "users", array(
+			"name" => "Paulo",
+			"age" => 50,
+			"state" => "Algeria"
+		));
+
+		$this->db->insert( "users", array(
+			"name" => "Nina",
+			"age" => 50,
+			"state" => "Nigeria"
+		));
+
+		$this->db->insert( "users", array(
+			"name" => "Ogwo",
+			"age" => 49,
+			"state" => "Nigeria"
+		));
+
+		$result = ($this->db->select( "*" )
+			->from( "users" )
+			->where( array( 
+				"state" => JSONDB::regex( "/ria/" ), 
+				"age" => JSONDB::regex( "/5[0-9]/" ) 
+			), JSONDB::AND )
+			->get()
+		);
+		
+		$this->assertEquals( 2, count($result) );
+		$this->assertEquals( "Paulo", $result[0][ "name" ] );
+		$this->assertEquals( "Nina", $result[1][ "name" ] );
+	}
+
+	public function testRegex() : void {
+		$this->load_db();
+
+		$this->db->insert( "users", array(
+			"name" => "Jajo",
+			"age" => 89,
+			"state" => "Abia"
+		));
+
+		$this->db->insert( "users", array(
+			"name" => "Mitchell",
+			"age" => 45,
+			"state" => "Zamfara"
+		));
+
+		$result = ( $this->db->select("*")
+			->from( "users")
+			->where(array( "state" => JSONDB::regex( "/Zam/" ) ) )
+			->get());
+		
+		$this->assertEquals( 'Mitchell', $result[ 0 ][ 'name' ] );
+	}
+
 	public function testUpdate() : void {
 		$this->load_db();
 
