@@ -442,8 +442,14 @@ CREATE TABLE `" . $table . "`
 
 		return $content;
 	}
-
-	public function get() {
+	
+  /**
+   * Get the data based on the provies defined query
+   * @param bool $false_on_empty In case the query as an empty result, set $false_on_empty to true so the method
+   * return an false instead of an empty array
+   * @return array|bool
+   */
+	public function get($false_on_empty = true) {
 		if($this->where != null) {
 			$content = $this->where_result();
 		}
@@ -464,6 +470,12 @@ CREATE TABLE `" . $table . "`
 			}
 			$content = $r;
 		}
+		
+
+		// Return false instead of an empty array
+    if ($false_on_empty && is_array($content) && count($content) < 1) {
+        return false;
+    }		
 
 		// Finally, lets do sorting :)
 		$content = $this->_process_order_by( $content );
