@@ -15,7 +15,21 @@ class JSONDB {
 	const DESC = 0;
 	const AND = "AND";
 	const OR = "OR";
+	
+	/** @var bool The current Result Mode */
+	protected $result_mode;
 
+	/** @var string Result Mode Object */
+	const ResultModeObject = 'object';
+
+	/** @var string Result Mode Array */
+	const ResultModeArray = 'array';
+
+	/**
+	 * JSONDB constructor.
+	 * @param $dir
+	 * @param int $json_encode_opt
+	 */
 	public function __construct( $dir, $json_encode_opt = JSON_UNESCAPED_UNICODE|JSON_PRETTY_PRINT ) {
 		$this->dir = $dir;
 		$this->json_opts[ 'encode' ] = $json_encode_opt;
@@ -440,6 +454,12 @@ CREATE TABLE `" . $table . "`
 			$content = $sorted;
 		}
 
+		if ($this->result_mode !== self::ResultModeArray) {
+			if ($this->result_mode === self::ResultModeObject) {
+		    		return json_decode(json_encode($content), FALSE);
+			}
+	    	}
+
 		return $content;
 	}
 
@@ -471,4 +491,21 @@ CREATE TABLE `" . $table . "`
 		$this->flush_indexes( true );
 		return $content;
 	}
+	
+
+    /**
+     * Change the mode of returning the result
+     * @param string $result_mode
+     * @throws \InvalidArgumentException
+     */
+    public function changeResultMode(string $result_mode)
+    {
+        if ($result_mode === self::ResultModeArray) {
+            $this->result_mode = self::ResultModeArray;
+        } elseif ($result_mode === self::ResultModeObject) {
+            $this->result_mode = self::ResultModeObject;
+        } else {
+            throw new InvalidArgumentException('The requested result mode is not supported');
+        }
+    }
 } 
