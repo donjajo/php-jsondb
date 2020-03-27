@@ -280,7 +280,7 @@ class JSONDB {
 			}, ARRAY_FILTER_USE_BOTH );
 			
 			// Make sure every  object is turned to array here.
-			return array_values( obj_to_array( $r ) );
+			return array_values( (array)( $r ) );
 		}
 	}
 
