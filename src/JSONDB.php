@@ -345,42 +345,42 @@ class JSONDB {
 		return false;
 	}
 	
-	public function to_mysql( $from, $to, $create_table = true ) {
-		$this->from( $from );
+	/**
+	 * Generates SQL from JSON
+	 * 
+	 * @param	string	$from			JSON file to get data from
+	 * @param	string	$to				Filename to write SQL into
+	 * @param	bool	$create_table	If to include create table in this export
+	 * 
+	 * @return	bool	Returns true if file was created, else false
+	 */
+	public function to_mysql( string $from, string $to, bool $create_table = true ) : bool {
+		$this->from( $from ); // Reads the JSON file
 		if( $this->content ) {
-			$table = pathinfo( $to, PATHINFO_FILENAME );
+			$table = pathinfo( $to, PATHINFO_FILENAME ); // Get filename to use as table
 
-			$sql = "-- PHP-JSONDB JSON to MySQL Dump
---\r\n\r\n";
+			$sql = "-- PHP-JSONDB JSON to MySQL Dump\n--\n\n";
 			if( $create_table ) {
-				$sql .= "
--- Table Structure for `" . $table . "`
---
-
-CREATE TABLE `" . $table . "`
-	(
-					";
+				// Should create table, generate a CREATE TABLE statement using the column of the first row
 				$first_row = ( array ) $this->content[ 0 ];
-				foreach( array_keys( $first_row ) as $column ) {
-					$s = '`' . $column . '` ' . $this->_to_mysql_type( gettype( $first_row[ $column ] ) ) ;
-					$s .= ( next( $first_row ) ? ',' : '' );
-					$sql .= $s;
-				}
-				$sql .= "
-	);\r\n";
+				$columns = array_map( function( $column ) use ( $first_row ) {
+					return sprintf( "\t`%s` %s", $column, $this->_to_mysql_type( gettype( $first_row[ $column ] ) ) );
+				}, array_keys($first_row));
+				
+				$sql = sprintf( "%s-- Table Structure for `%s`\n--\n\nCREATE TABLE `%s` \n(\n%s\n);\n", $sql, $table, $table, implode( ",\n", $columns ) );
 			}
 
-			foreach( $this->content as $values ) {
-				$values = ( array ) $values;
-				$v = array_map( function( $vv ) {
+			foreach( $this->content as $row ) {
+				$row = ( array ) $row;
+				$values = array_map( function( $vv ) {
 					$vv = ( is_array( $vv ) || is_object( $vv ) ? serialize( $vv ) : $vv );
-					return "'" . addslashes( $vv ) . "'";
-				}, array_values( $values ) );
+					return sprintf( "'%s'", addslashes( (string)$vv ) );
+				}, array_values( $row ) );
 
-				$c = array_map( function( $vv ) {
-					return "`" . $vv . "`";
-				}, array_keys( $values ) );
-				$sql .= sprintf( "INSERT INTO `%s` ( %s ) VALUES ( %s );\n", $table, implode( ', ', $c ), implode( ', ', $v ) );
+				$cols = array_map( function( $col ) {
+					return sprintf( "`%s`", $col );
+				}, array_keys( $row ) );
+				$sql .= sprintf( "INSERT INTO `%s` ( %s ) VALUES ( %s );\n", $table, implode( ', ', $cols ), implode( ', ', $values ) );
 			}
 			file_put_contents( $to, $sql );
 			return true;

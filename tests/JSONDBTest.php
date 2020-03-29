@@ -193,6 +193,14 @@ class InsertTest extends TestCase {
 
 	}
 
+	public function testSQLExport() : void {
+		$this->load_db();
+
+		$this->db->to_mysql( "users", "tests/users.sql" );
+
+		$this->assertTrue(file_exists( "tests/users.sql" ) );
+	}
+
 	public function testDelete() : void {
 		$this->load_db();
 
