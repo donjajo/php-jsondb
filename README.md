@@ -74,6 +74,17 @@ print_r( $users );
 	
 	
 ```
+##### Where Statement with regex:
+By passing`JSONDB::regex` to where statement, you can apply regex searching. It can be used for implementing `LIKE` or `REGEXP_LIKE` clause in SQL.
+
+```php
+$users = $json_db->select( 'name, state' )
+	->from( "users" )
+	->where( array( "state" => JSONDB::regex( "/ria/" )), JSONDB::AND )
+	->get();
+print_r( $users );
+// Outputs are rows which contains "ria" string. 
+```
 
 ##### Order By:
 Thanks to [Tarun Shanker](http://in.linkedin.com/in/tarunshankerpandey) for this feature. By passing the `order_by()` method, the result is sorted with 2 arguments of the column name and sort method - `JSONDB::ASC` and `JSONDB::DESC`
