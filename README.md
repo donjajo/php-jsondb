@@ -83,7 +83,7 @@ $users = $json_db->select( 'name, state' )
 	->where( array( "state" => JSONDB::regex( "/ria/" )), JSONDB::AND )
 	->get();
 print_r( $users );
-// Outputs are rows which contains "ria" string. 
+// Outputs are rows which contains "ria" string in "state" column. 
 ```
 
 ##### Order By:
