@@ -128,11 +128,33 @@ class JSONDB {
 	 * 
 	 * @param string $file json filename without extension
 	 * @param array $values Array of columns as keys and values
+	 * @param bool $_id Generate a unique ID
 	 * 
 	 * @return array $last_indexes Array of last index inserted
 	 */
-	public function insert( $file, array $values ) : array {
+	public function insert( $file, array $values, $_id = true ) : array {
 		$this->from( $file );
+
+		if( $_id ) {
+			$bin = sprintf(
+				"%s%s%s%s",
+				pack('N', time()),
+				substr(md5(php_uname('n')), 0, 3),
+				pack('n', getmypid()),
+				substr(pack('N', mt_rand(0, mt_getrandmax())), 1, 3)
+			);
+
+			$_id = '';
+			for ($i = 0; $i < 12; $i++) {
+				$_id .= sprintf("%02x", ord($bin[$i]));
+			}
+
+			/**
+			 * Generate ID like MongoDB
+			 * @author Julius Beckmann <github.com/h4cc>
+			 */
+			$values['_id'] = $_id;
+		}
 
 		if( !empty( $this->content[ 0 ] ) ) {
 			$nulls = array_diff_key( ( array ) $this->content[ 0 ], $values );
