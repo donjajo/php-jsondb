@@ -36,6 +36,12 @@ class JSONDB {
 		// Read content of JSON file
 		$content = file_get_contents( $this->file );
 		$content = json_decode( $content );
+		
+		// Check file extension
+		if( pathinfo( $this->file, PATHINFO_EXTENSION ) !== 'json' ) {
+			throw new \Exception( 'This file is not json!' );
+			return false;
+		}
 
 		// Check if its arrays of jSON
 		if( !is_array( $content ) && is_object( $content ) ) {
