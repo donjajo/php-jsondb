@@ -10,8 +10,7 @@ CREATE TABLE `users`
 	`state` VARCHAR( 255 ),
 	`age` INT
 );
-INSERT INTO `users` ( `name`, `state`, `age` ) VALUES ( 'James£', 'Imo', '48' );
-INSERT INTO `users` ( `name`, `state`, `age` ) VALUES ( 'Dummy', 'Rivers', '12' );
+INSERT INTO `users` ( `name`, `state`, `age` ) VALUES ( 'John£', 'Benue', '22' );
 INSERT INTO `users` ( `name`, `age`, `state` ) VALUES ( 'Jammy', '21', 'Sokoto' );
 INSERT INTO `users` ( `name`, `age`, `state` ) VALUES ( 'Jajo', '', 'Lagos' );
 INSERT INTO `users` ( `name`, `age`, `state` ) VALUES ( 'Johnny', '30', 'Ogun' );

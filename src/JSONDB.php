@@ -4,6 +4,8 @@ namespace Jajo;
 
 class JSONDB {
 	public $file, $content = [];
+	private $fp;
+	private $load;
 	private $where, $select, $merge, $update;
 	private $delete = false;
 	private $last_indexes = [];
@@ -21,6 +23,20 @@ class JSONDB {
 		$this->json_opts[ 'encode' ] = $json_encode_opt;
 	}
 
+	public function check_fp_size() {
+		$size = 0;
+		$cur_size = 0;
+
+		if ( $this->fp ) {
+			$cur_size = ftell( $this->fp );
+			fseek( $this->fp, 0, SEEK_END );
+			$size = ftell( $this->fp );
+			fseek( $this->fp, $cur_size, SEEK_SET );
+		}
+
+		return $size;
+	}
+
 	private function check_file() {
 		/**
 		 * Checks and validates if JSON file exists
@@ -30,12 +46,37 @@ class JSONDB {
 
 		// Checks if JSON file exists, if not create
 		if( !file_exists( $this->file ) ) {
-			$this->commit();
+			touch( $this->file );
+			// $this->commit();
 		}
 
-		// Read content of JSON file
-		$content = file_get_contents( $this->file );
-		$content = json_decode( $content );
+		if ( 'partial' == $this->load ) {
+			$this->fp = fopen( $this->file, 'r+' );
+			if ( ! $this->fp ) {
+				throw new \Exception( 'Unable to open json file' );
+			}
+
+			if ( ( $size = $this->check_fp_size() ) ) {
+				$content = get_json_chunk( $this->fp );
+
+				// We could not get the first chunk of JSON. Lets try to load everything then
+				if ( ! $content ) {
+					$content = fread( $this->fp, $size );
+				} else {
+					// We got the first chunk, we still need to put it into an array
+					$content = sprintf( '[%s]', $content );
+				}
+
+				$content = json_decode( $content, true );
+			} else {
+				// Empty file. File was just created
+				$content = array();
+			}
+		} else {
+			// Read content of JSON file
+			$content = file_get_contents( $this->file );
+			$content = json_decode( $content, true );
+		}
 
 		// Check if its arrays of jSON
 		if( !is_array( $content ) && is_object( $content ) ) {
@@ -47,8 +88,10 @@ class JSONDB {
 			throw new \Exception( 'json is invalid' );
 			return false;
 		}
-		else
+		else {
+			$this->content = $content;
 			return true;
+		}
 	}
 
 	public function select( $args = '*' ) {
@@ -69,7 +112,7 @@ class JSONDB {
 		return $this;
 	}
 
-	public function from( $file ) {
+	public function from( $file, $load = 'full' ) {
 		/**
 		 * Loads the jSON file
 		 *
@@ -82,12 +125,13 @@ class JSONDB {
 		// Reset where
 		$this->where( [] );
 		$this->content = '';
+		$this->load = $load;
 
 		// Reset order by
 		$this->order_by = [];
 
 		if( $this->check_file() ) {
-			$this->content = ( array ) json_decode( file_get_contents( $this->file ) );
+			//$this->content = ( array ) json_decode( file_get_contents( $this->file ) );
 		}
 		return $this;
 	}
@@ -131,34 +175,117 @@ class JSONDB {
 	 * 
 	 * @return array $last_indexes Array of last index inserted
 	 */
-	public function insert( $file, array $values ) : array {
-		$this->from( $file );
+	public function insert( $file, array $values ) {
+		$this->from( $file, 'partial' );
 
-		if( !empty( $this->content[ 0 ] ) ) {
-			$nulls = array_diff_key( ( array ) $this->content[ 0 ], $values );
-			if( $nulls ) {
-				$nulls = array_map( function() {
-					return '';
-				}, $nulls );
-				$values = array_merge( $values, $nulls );
+		$first_row =  current( $this->content );
+		$this->content = array();
+
+		if( ! empty( $first_row ) ) {
+			$unmatched_columns = 0;
+
+			foreach ( $first_row as $column => $value ) {
+				if ( ! isset( $values[ $column ] ) ) {
+					$values[ $column ] = '';
+				}
+			}
+
+			foreach ( $values as $col => $val ) {
+				if ( ! isset( $first_row[ $col ] ) ) {
+					$unmatched_columns = 1;
+					break;
+				}
+			}
+
+			if ( $unmatched_columns ) {
+				throw new \Exception( 'Columns must match as of the first row' );
 			}
 		}
 
-		if( !empty( $this->content ) && array_diff_key( $values, (array ) $this->content[ 0 ] ) ) {
-			throw new Exception( 'Columns must match as of the first row' );
-		}
-		else {
-			$this->content[] = ( object ) $values;
-			$this->last_indexes = [ ( count( $this->content ) - 1 ) ];
-			$this->commit();
-		}
-		return $this->last_indexes;
+		$this->content[] = $values;
+		// $this->last_indexes = [ ( count( $this->content ) - 1 ) ];
+		$this->commit();
+
+		// return $this->last_indexes;
 	}
 
 	public function commit() {
-		$f = fopen( $this->file, 'w+' );
-		fwrite( $f, ( !$this->content ? '[]' : json_encode( $this->content, $this->json_opts[ 'encode' ] ) ) );
+		if ( $this->fp && is_resource( $this->fp ) ) {
+			$f = $this->fp;
+		} else {
+			$f = fopen( $this->file, 'w+' );
+		}
+
+		if ( 'full' === $this->load ) {
+			// Write everything back into the file
+			fwrite( $f, ( !$this->content ? '[]' : json_encode( $this->content, $this->json_opts[ 'encode' ] ) ) );
+		} else if ( 'partial' === $this->load ) {
+			// Append it
+			$this->append();
+		} else {
+			// Unknown load type
+			fclose( $f );
+			throw new \Exception( 'Write fail: Unkown load type provided', 'write_error' );
+		}
+
 		fclose( $f );
+	}
+
+	private function append() {
+		$size = $this->check_fp_size();
+		$per_read = 64;
+		$read_size = -$per_read;
+		$lstblkbrkt = false;
+		$lastinput = false;
+		$i = $size;
+		$data = json_encode( $this->content, $this->json_opts['encode'] );
+
+		if ( $size ) {
+			fseek( $this->fp, $read_size, SEEK_END );
+
+			while ( ( $read = fread( $this->fp, $per_read ) ) ) {
+				$per_read = $i - $per_read < 0 ? $i : $per_read;
+				if ( false === $lstblkbrkt ) {
+					$lstblkbrkt = strrpos( $read, ']', 0 );
+					if ( false !== $lstblkbrkt ) {
+						$lstblkbrkt = ( $i - $per_read ) + $lstblkbrkt;
+					}
+				}
+
+				if ( false !== $lstblkbrkt ) {
+					$lastinput = strrpos( $read, '}' );
+					if ( false !== $lastinput ) {
+						$lastinput = ( $i - $per_read ) + $lastinput;
+						break;
+					}
+				}
+
+				$i -= $per_read; 
+				$read_size += -$per_read;
+				if ( abs( $read_size ) >= $size ) {
+					break;
+				}
+				fseek( $this->fp, $read_size, SEEK_END );
+			}
+		}
+
+		if ( false !== $lstblkbrkt ) {
+			// We found existing json data, don't write extra []
+			$data = substr( $data, 1 );
+			$data = substr( $data, 0, -1 );
+			if ( false !== $lastinput ) {
+				$data = sprintf( ',%s]', $data );
+			}
+		} else {
+			if ( $size > 0 ) {
+				throw new \Exception( 'Append error: JSON file looks malformed' );
+			}
+
+			$lstblkbrkt = 0;
+		}
+
+		fseek( $this->fp, $lstblkbrkt, SEEK_SET );
+		fwrite( $this->fp, $data );
 	}
 
 	private function _update() {
@@ -232,6 +359,10 @@ class JSONDB {
 		$this->last_indexes = array();
 		if( $flush_where )
 			$this->where = array();
+
+		if ( $this->fp && is_resource( $this->fp ) ) {
+			fclose( $this->fp );
+		}
 	}
 
 	private function intersect_value_check($a, $b) {

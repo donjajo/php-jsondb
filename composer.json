@@ -14,7 +14,8 @@
             "Jajo\\" : "src/"
         },
         "files" : [
-            "helpers/dataTypes.php"
+            "helpers/dataTypes.php",
+            "helpers/json.php"
         ]
     },
     "require": {},

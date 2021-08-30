@@ -8,7 +8,7 @@ class PerformanceTest extends TestCase {
 	private $jsondb;
 
 	protected function setUp(): void {
-		$this->jsondb = new JSONDB(__DIR__);
+		$this->jsondb = new JSONDB(__DIR__, JSON_UNESCAPED_UNICODE);
 	}
 
 	protected function tearDown(): void {
@@ -29,7 +29,7 @@ class PerformanceTest extends TestCase {
 				$sum += ( $stop - $start )/1000000;
 			}
 			$i += $j;
-			fprintf( STDOUT, "\nTook average of %fs to insert batch %d", $sum / 1000, $i / 1000 );
+			fprintf( STDOUT, "\nTook average of %fs to insert 1000 batch %d", $sum / 1000, $i / 1000 );
 			fflush(STDOUT);
 		}
 	}
