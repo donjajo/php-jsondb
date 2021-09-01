@@ -29,8 +29,11 @@ class PerformanceTest extends TestCase {
 				$sum += ( $stop - $start )/1000000;
 			}
 			$i += $j;
-			fprintf( STDOUT, "\nTook average of %fs to insert 1000 batch %d", $sum / 1000, $i / 1000 );
+			fprintf( STDOUT, "\nTook average of %fms to insert 1000 records - BATCH %d", $sum, $i / 1000 );
 			fflush(STDOUT);
 		}
+
+		$foods = $this->jsondb->select('name')->from( 'food' )->get();
+		$this->assertCount( 5000, $foods );
 	}
 }
