@@ -7,12 +7,15 @@ use \Jajo\JSONDB;
 class InsertTest extends TestCase {
 	private $db;
 
-	public function load_db() {
-		$this->db = new JSONDB( __DIR__ );
+	protected function setUp(): void {
+		$this->db = new JSONDB(__DIR__);
+	}
+
+	public function tearDown() {
+		@unlink( __DIR__ . '/users.sql' );
 	}
 
 	public function testInsert() : void {
-		$this->load_db();
 		$names = [ 'James£', 'John£', 'Oji£', 'Okeke', 'Bola', 'Thomas', 'Ibrahim', 'Smile' ];
 		$states = [ 'Abia', 'Lagos', 'Benue', 'Kano', 'Kastina', 'Abuja', 'Imo', 'Ogun' ];
 		shuffle( $names );
@@ -29,17 +32,21 @@ class InsertTest extends TestCase {
 			'age' => $age
 		]);
 
-		$this->assertArrayHasKey( 0, $indexes );
+		$user = $this->db->select( '*' )
+			->from( 'users' )
+			->where( [ 'name' => $name, 'state' => $state, 'age' => $age ], 'AND' )
+			->get();
 
 		$this->db->insert( "users", array(
 			"name" => "Dummy",
 			"state" => "Lagos",
 			"age" => 12
 		));
+
+		$this->assertEquals( $name, $user[0]['name'] );
 	}
 
 	public function testGet() : void {
-		$this->load_db();
 		printf( "\nCheck exist\n" );
 		$users = ( $this->db->select( '*' )
 			->from( 'users' )
@@ -48,7 +55,6 @@ class InsertTest extends TestCase {
 	}
 
 	public function testWhere() : void {
-		$this->load_db();
 		$result = ( $this->db->select( '*' )
 				->from( 'users' )
 				->where([ 'name' => 'Okeke' ])
@@ -74,8 +80,6 @@ class InsertTest extends TestCase {
 	}
 
 	public function testMultiWhere() : void {
-		$this->load_db();
-
 		$this->db->insert( "users", array(
 			"name" => "Jajo",
 			"age" => null,
@@ -93,8 +97,6 @@ class InsertTest extends TestCase {
 	}
 
 	public function testAND() : void {
-		$this->load_db();
-
 		$this->db->insert( "users", array(
 			"name" => "Jajo",
 			"age" => 50,
@@ -114,8 +116,6 @@ class InsertTest extends TestCase {
 	}
 
 	public function testRegexAND() : void {
-		$this->load_db();
-
 		$this->db->insert( "users", array(
 			"name" => "Paulo",
 			"age" => 50,
@@ -149,8 +149,6 @@ class InsertTest extends TestCase {
 	}
 
 	public function testRegex() : void {
-		$this->load_db();
-
 		$this->db->insert( "users", array(
 			"name" => "Jajo",
 			"age" => 89,
@@ -172,8 +170,6 @@ class InsertTest extends TestCase {
 	}
 
 	public function testUpdate() : void {
-		$this->load_db();
-
 		$this->db->update([ 'name' => 'Jammy', 'state' => 'Sokoto' ])
 			->from( 'users' )
 			->where([ 'name' => 'Okeke' ])
@@ -194,16 +190,12 @@ class InsertTest extends TestCase {
 	}
 
 	public function testSQLExport() : void {
-		$this->load_db();
-
 		$this->db->to_mysql( "users", "tests/users.sql" );
 
 		$this->assertTrue(file_exists( "tests/users.sql" ) );
 	}
 
 	public function testDelete() : void {
-		$this->load_db();
-
 		$this->db->delete()
 			->from( 'users' )
 			->where([ 'name' => 'Jammy' ])
@@ -217,9 +209,7 @@ class InsertTest extends TestCase {
 		$this->assertEmpty( $result );
 	}
 
-	public function testDeleteAll() : void {
-		$this->load_db();
-		
+	public function testDeleteAll() : void {		
 		/* I add a select action with where statement */
 		$result_before = $this->db->select( '*' )
 			->from( 'users' )
