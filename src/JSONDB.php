@@ -186,7 +186,7 @@ class JSONDB {
 
 			foreach ( $first_row as $column => $value ) {
 				if ( ! isset( $values[ $column ] ) ) {
-					$values[ $column ] = '';
+					$values[ $column ] = null;
 				}
 			}
 
@@ -233,7 +233,7 @@ class JSONDB {
 
 	private function append() {
 		$size = $this->check_fp_size();
-		$per_read = 64;
+		$per_read = $size > 64 ? 64 : $size;
 		$read_size = -$per_read;
 		$lstblkbrkt = false;
 		$lastinput = false;
@@ -270,11 +270,10 @@ class JSONDB {
 		}
 
 		if ( false !== $lstblkbrkt ) {
-			// We found existing json data, don't write extra []
+			// We found existing json data, don't write extra [
 			$data = substr( $data, 1 );
-			$data = substr( $data, 0, -1 );
 			if ( false !== $lastinput ) {
-				$data = sprintf( ',%s]', $data );
+				$data = sprintf( ',%s', $data );
 			}
 		} else {
 			if ( $size > 0 ) {
