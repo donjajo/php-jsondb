@@ -1,6 +1,9 @@
 ## php-jsondb
 A PHP Class that reads JSON file as a database. Use for sample DBs.
 
+### GitlabDB
+[GitlabDB](https://github.com/darkterminal/GitlabDB) A PHP Class that reads JSON file as a database. Use for sample DBs using Gitlab API inspire from [donjajo/php-jsondb](https://github.com/donjajo/php-jsondb)
+
 ### Usage
 Install package `composer require jajo/jsondb`
 #### Initialize
