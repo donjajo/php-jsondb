@@ -21,10 +21,10 @@ class PerformanceTest extends TestCase {
 			$sum = 0;
 			for ($j = 0; $j < 1000; $j++ ) {
 				$start = hrtime( true );
-				$this->jsondb->insert( 'food', array(
+				$this->jsondb->insert( 'food', [
 					'name' => 'Rice',
 					'class' => 'Carbohydrate',
-				) );
+				] );
 				$stop = hrtime( true );
 				$sum += ( $stop - $start )/1000000;
 			}

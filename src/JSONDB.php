@@ -70,7 +70,7 @@ class JSONDB {
 				$content = json_decode( $content, true );
 			} else {
 				// Empty file. File was just created
-				$content = array();
+				$content = [];
 			}
 		} else {
 			// Read content of JSON file
@@ -179,7 +179,7 @@ class JSONDB {
 		$this->from( $file, 'partial' );
 
 		$first_row =  current( $this->content );
-		$this->content = array();
+		$this->content = [];
 
 		if( ! empty( $first_row ) ) {
 			$unmatched_columns = 0;
@@ -333,7 +333,7 @@ class JSONDB {
 				$this->content = array_values( $this->content );
 			}
 			elseif( empty( $this->where ) && empty( $this->last_indexes ) ) {
-				$this->content = array();
+				$this->content = [];
 			}
 			
 			$return = true;
@@ -355,9 +355,9 @@ class JSONDB {
 	 * @return object $this 
 	 */
 	private function flush_indexes( $flush_where = false ) {
-		$this->last_indexes = array();
+		$this->last_indexes = [];
 		if( $flush_where )
-			$this->where = array();
+			$this->where = [];
 
 		if ( $this->fp && is_resource( $this->fp ) ) {
 			fclose( $this->fp );
@@ -401,7 +401,7 @@ class JSONDB {
 				$row = (array) $row; // Convert first stage to array if object
 				
 				// Check for rows intersecting with the where values.
-				if( array_uintersect_uassoc( $row, $this->where, array($this, "intersect_value_check" ), "strcasecmp" ) /*array_intersect_assoc( $row, $this->where )*/ ) {
+				if( array_uintersect_uassoc( $row, $this->where, [$this, "intersect_value_check" ], "strcasecmp" ) /*array_intersect_assoc( $row, $this->where )*/ ) {
 					$this->last_indexes[] =  $index;
 					return true;
 				}
@@ -433,7 +433,7 @@ class JSONDB {
 
 			
 			//check if the row = where['col'=>'val', 'col2'=>'val2']
-			if(!array_udiff_uassoc($this->where,$row, array($this, "intersect_value_check" ), "strcasecmp" ) ) {
+			if(!array_udiff_uassoc($this->where,$row, [$this, "intersect_value_check" ], "strcasecmp" ) ) {
 				$r[] = $row;
 				// Append also each row array key
 				$this->last_indexes[] = $index;			
