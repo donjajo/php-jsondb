@@ -1,4 +1,4 @@
-<?php 
+<?php
 declare( strict_types=1 );
 
 use PHPUnit\Framework\TestCase;
@@ -11,7 +11,7 @@ class InsertTest extends TestCase {
 		$this->db = new JSONDB(__DIR__);
 	}
 
-	public function tearDown() {
+	public function tearDown(): void {
 		@unlink( __DIR__ . '/users.sql' );
 	}
 
@@ -75,7 +75,7 @@ class InsertTest extends TestCase {
 				->get()
 			);
 		}
-	
+
 		$this->assertEquals( 'Okeke', $result[ 0 ][ 'name' ] );
 	}
 
@@ -136,13 +136,13 @@ class InsertTest extends TestCase {
 
 		$result = ($this->db->select( "*" )
 			->from( "users" )
-			->where( array( 
-				"state" => JSONDB::regex( "/ria/" ), 
-				"age" => JSONDB::regex( "/5[0-9]/" ) 
+			->where( array(
+				"state" => JSONDB::regex( "/ria/" ),
+				"age" => JSONDB::regex( "/5[0-9]/" )
 			), JSONDB::AND )
 			->get()
 		);
-		
+
 		$this->assertEquals( 2, count($result) );
 		$this->assertEquals( "Paulo", $result[0][ "name" ] );
 		$this->assertEquals( "Nina", $result[1][ "name" ] );
@@ -165,7 +165,7 @@ class InsertTest extends TestCase {
 			->from( "users")
 			->where(array( "state" => JSONDB::regex( "/Zam/" ) ) )
 			->get());
-		
+
 		$this->assertEquals( 'Mitchell', $result[ 0 ][ 'name' ] );
 	}
 
@@ -174,7 +174,7 @@ class InsertTest extends TestCase {
 			->from( 'users' )
 			->where([ 'name' => 'Okeke' ])
 			->trigger();
-		
+
 		$this->db->update([ "state" => "Rivers"])
 			->from( "users" )
 			->where([ "name" => "Dummy" ])
@@ -209,13 +209,13 @@ class InsertTest extends TestCase {
 		$this->assertEmpty( $result );
 	}
 
-	public function testDeleteAll() : void {		
+	public function testDeleteAll() : void {
 		/* I add a select action with where statement */
 		$result_before = $this->db->select( '*' )
 			->from( 'users' )
 			->where([ 'state' => 'Rivers' ])
 			->get();
-		
+
 		/* Select action works fine */
 		printf("\nCount of select action's result : %d", count($result_before) );
 		$this->assertTrue( $result_before[ 0 ][ 'name' ] == 'Dummy');
