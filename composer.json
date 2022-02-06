@@ -22,6 +22,7 @@
         "php": ">=7.3"
     },
     "require-dev": {
+        "symplify/easy-coding-standard": "dev-main",
         "phpunit/phpunit": "^9.5"
     }
 }

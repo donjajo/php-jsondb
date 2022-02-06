@@ -37,11 +37,11 @@ class InsertTest extends TestCase {
 			->where( [ 'name' => $name, 'state' => $state, 'age' => $age ], 'AND' )
 			->get();
 
-		$this->db->insert( "users", array(
+		$this->db->insert( "users", [
 			"name" => "Dummy",
 			"state" => "Lagos",
 			"age" => 12
-		));
+		]);
 
 		$this->assertEquals( $name, $user[0]['name'] );
 	}
@@ -80,66 +80,66 @@ class InsertTest extends TestCase {
 	}
 
 	public function testMultiWhere() : void {
-		$this->db->insert( "users", array(
+		$this->db->insert( "users", [
 			"name" => "Jajo",
 			"age" => null,
 			"state" => "Lagos"
-		));
+		]);
 
-		$this->db->insert( "users", array(
+		$this->db->insert( "users", [
 			"name" => "Johnny",
 			"age" => 30,
 			"state" => "Ogun"
-		));
+		]);
 
-		$result = $this->db->select( "*" )->from( "users" )->where( array( "age" => null, "name" => "Jajo" ) )->get();
+		$result = $this->db->select( "*" )->from( "users" )->where( [ "age" => null, "name" => "Jajo" ] )->get();
 		$this->assertEquals( 'Jajo', $result[ 0 ][ 'name' ] );
 	}
 
 	public function testAND() : void {
-		$this->db->insert( "users", array(
+		$this->db->insert( "users", [
 			"name" => "Jajo",
 			"age" => 50,
 			"state" => "Lagos"
-		));
+		]);
 
-		$this->db->insert( "users", array(
+		$this->db->insert( "users", [
 			"name" => "Johnny",
 			"age" => 50,
 			"state" => "Ogun"
-		));
+		]);
 
-		$result = $this->db->select( "*" )->from( "users" )->where( array( "age" => 50, "name" => "Jajo" ), JSONDB::AND )->get();
+		$result = $this->db->select( "*" )->from( "users" )->where( [ "age" => 50, "name" => "Jajo" ], JSONDB::AND )->get();
 
 		$this->assertEquals( 1, count($result) );
 		$this->assertEquals( "Jajo", $result[0][ 'name' ] );
 	}
 
 	public function testRegexAND() : void {
-		$this->db->insert( "users", array(
+		$this->db->insert( "users", [
 			"name" => "Paulo",
 			"age" => 50,
 			"state" => "Algeria"
-		));
+		]);
 
-		$this->db->insert( "users", array(
+		$this->db->insert( "users", [
 			"name" => "Nina",
 			"age" => 50,
 			"state" => "Nigeria"
-		));
+		]);
 
-		$this->db->insert( "users", array(
+		$this->db->insert( "users", [
 			"name" => "Ogwo",
 			"age" => 49,
 			"state" => "Nigeria"
-		));
+		]);
 
 		$result = ($this->db->select( "*" )
 			->from( "users" )
-			->where( array(
+			->where( [
 				"state" => JSONDB::regex( "/ria/" ),
 				"age" => JSONDB::regex( "/5[0-9]/" )
-			), JSONDB::AND )
+			], JSONDB::AND )
 			->get()
 		);
 
@@ -149,21 +149,21 @@ class InsertTest extends TestCase {
 	}
 
 	public function testRegex() : void {
-		$this->db->insert( "users", array(
+		$this->db->insert( "users", [
 			"name" => "Jajo",
 			"age" => 89,
 			"state" => "Abia"
-		));
+		]);
 
-		$this->db->insert( "users", array(
+		$this->db->insert( "users", [
 			"name" => "Mitchell",
 			"age" => 45,
 			"state" => "Zamfara"
-		));
+		]);
 
 		$result = ( $this->db->select("*")
 			->from( "users")
-			->where(array( "state" => JSONDB::regex( "/Zam/" ) ) )
+			->where([ "state" => JSONDB::regex( "/Zam/" ) ] )
 			->get());
 
 		$this->assertEquals( 'Mitchell', $result[ 0 ][ 'name' ] );
