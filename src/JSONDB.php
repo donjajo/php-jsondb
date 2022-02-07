@@ -106,13 +106,12 @@ class JSONDB
         // Check if its arrays of jSON
         if (! is_array($content) && is_object($content)) {
             throw new \Exception('An array of json is required: Json data enclosed with []');
-            return false;
         }
         // An invalid jSON file
         elseif (! is_array($content) && ! is_object($content)) {
             throw new \Exception('json is invalid');
-            return false;
         }
+
         $this->content = $content;
         return true;
     }
@@ -171,12 +170,7 @@ class JSONDB
     /**
      * Implements regex search on where statement.
      *
-<<<<<<< HEAD
      * @param int $preg_match_flags See https://www.php.net/manual/en/function.preg-match.php
-=======
-     * @param	string	$pattern			Regex pattern
-     * @param	int		$preg_match_flags	Flags for preg_grep(). See - https://www.php.net/manual/en/function.preg-match.php
->>>>>>> level 1, 2 fixes
      */
     public static function regex(string $pattern, int $preg_match_flags = 0): object
     {
@@ -339,7 +333,7 @@ class JSONDB
                 }
             }
         } elseif (! empty($this->where) && empty($this->last_indexes)) {
-            null;
+            return;
         } else {
             foreach ($this->content as $i => $v) {
                 $content = (array) $this->content[$i];
