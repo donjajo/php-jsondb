@@ -35,9 +35,9 @@ class JSONDB
 
     public const DESC = 0;
 
-    public const AND = "AND";
+    public const AND = 'AND';
 
-    public const OR = "OR";
+    public const OR = 'OR';
 
     public function __construct($dir, $json_encode_opt = JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT)
     {
@@ -74,13 +74,14 @@ class JSONDB
             // $this->commit();
         }
 
-        if ('partial' == $this->load) {
+        if ($this->load == 'partial') {
             $this->fp = fopen($this->file, 'r+');
             if (! $this->fp) {
                 throw new \Exception('Unable to open json file');
             }
 
-            if (($size = $this->check_fp_size())) {
+            $size = $this->check_fp_size();
+            if ($size) {
                 $content = get_json_chunk($this->fp);
 
                 // We could not get the first chunk of JSON. Lets try to load everything then
@@ -113,6 +114,8 @@ class JSONDB
             $this->content = $content;
             return true;
         }
+        $this->content = $content;
+        return true;
     }
 
     public function select($args = '*')
@@ -245,10 +248,10 @@ class JSONDB
             $f = fopen($this->file, 'w+');
         }
 
-        if ('full' === $this->load) {
+        if ($this->load === 'full') {
             // Write everything back into the file
             fwrite($f, (! $this->content ? '[]' : json_encode($this->content, $this->json_opts['encode'])));
-        } elseif ('partial' === $this->load) {
+        } elseif ($this->load === 'partial') {
             // Append it
             $this->append();
         } else {
@@ -275,16 +278,16 @@ class JSONDB
 
             while (($read = fread($this->fp, $per_read))) {
                 $per_read = $i - $per_read < 0 ? $i : $per_read;
-                if (false === $lstblkbrkt) {
+                if ($lstblkbrkt === false) {
                     $lstblkbrkt = strrpos($read, ']', 0);
-                    if (false !== $lstblkbrkt) {
+                    if ($lstblkbrkt !== false) {
                         $lstblkbrkt = ($i - $per_read) + $lstblkbrkt;
                     }
                 }
 
-                if (false !== $lstblkbrkt) {
+                if ($lstblkbrkt !== false) {
                     $lastinput = strrpos($read, '}');
-                    if (false !== $lastinput) {
+                    if ($lastinput !== false) {
                         $lastinput = ($i - $per_read) + $lastinput;
                         break;
                     }
@@ -299,10 +302,10 @@ class JSONDB
             }
         }
 
-        if (false !== $lstblkbrkt) {
+        if ($lstblkbrkt !== false) {
             // We found existing json data, don't write extra [
             $data = substr($data, 1);
-            if (false !== $lastinput) {
+            if ($lastinput !== false) {
                 $data = sprintf(',%s', $data);
             }
         } else {
@@ -423,25 +426,24 @@ class JSONDB
     {
         $this->flush_indexes();
 
-        if ($this->merge == "AND") {
+        if ($this->merge == 'AND') {
             return $this->where_and_result();
-        } else {
-            // Filter array
-            $r = array_filter($this->content, function ($row, $index) {
-                $row = (array) $row; // Convert first stage to array if object
-
-                // Check for rows intersecting with the where values.
-                if (array_uintersect_uassoc($row, $this->where, [$this, "intersect_value_check"], "strcasecmp") /*array_intersect_assoc( $row, $this->where )*/) {
-                    $this->last_indexes[] = $index;
-                    return true;
-                }
-
-                return false;
-            }, ARRAY_FILTER_USE_BOTH);
-
-            // Make sure every  object is turned to array here.
-            return array_values(obj_to_array($r));
         }
+        // Filter array
+        $r = array_filter($this->content, function ($row, $index) {
+            $row = (array) $row; // Convert first stage to array if object
+
+            // Check for rows intersecting with the where values.
+            if (array_uintersect_uassoc($row, $this->where, [$this, 'intersect_value_check'], 'strcasecmp') /*array_intersect_assoc( $row, $this->where )*/) {
+                $this->last_indexes[] = $index;
+                return true;
+            }
+
+            return false;
+        }, ARRAY_FILTER_USE_BOTH);
+
+        // Make sure every  object is turned to array here.
+        return array_values(obj_to_array($r));
     }
 
     /**
@@ -463,7 +465,7 @@ class JSONDB
             $row = (array) $row;
 
             //check if the row = where['col'=>'val', 'col2'=>'val2']
-            if (! array_udiff_uassoc($this->where, $row, [$this, "intersect_value_check"], "strcasecmp")) {
+            if (! array_udiff_uassoc($this->where, $row, [$this, 'intersect_value_check'], 'strcasecmp')) {
                 $r[] = $row;
                 // Append also each row array key
                 $this->last_indexes[] = $index;
@@ -538,15 +540,14 @@ class JSONDB
                 }, array_values($row));
 
                 $cols = array_map(function ($col) {
-                    return sprintf("`%s`", $col);
+                    return sprintf('`%s`', $col);
                 }, array_keys($row));
                 $sql .= sprintf("INSERT INTO `%s` ( %s ) VALUES ( %s );\n", $table, implode(', ', $cols), implode(', ', $values));
             }
             file_put_contents($to, $sql);
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
     private function _to_mysql_type($type)
