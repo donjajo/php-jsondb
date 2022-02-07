@@ -27,6 +27,8 @@
         "phpstan/phpstan": "^1.4"
     },
     "scripts": {
+        "check-cs": "vendor/bin/ecs check --ansi",
+        "fix-cs": "vendor/bin/ecs check --fix --ansi",
         "phpstan": "vendor/bin/phpstan --ansi"
     }
 }
