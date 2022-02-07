@@ -171,7 +171,12 @@ class JSONDB
     /**
      * Implements regex search on where statement.
      *
+<<<<<<< HEAD
      * @param int $preg_match_flags See https://www.php.net/manual/en/function.preg-match.php
+=======
+     * @param	string	$pattern			Regex pattern
+     * @param	int		$preg_match_flags	Flags for preg_grep(). See - https://www.php.net/manual/en/function.preg-match.php
+>>>>>>> level 1, 2 fixes
      */
     public static function regex(string $pattern, int $preg_match_flags = 0): object
     {
