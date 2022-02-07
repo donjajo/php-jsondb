@@ -23,6 +23,10 @@
     },
     "require-dev": {
         "symplify/easy-coding-standard": "dev-main",
-        "phpunit/phpunit": "^9.5"
+        "phpunit/phpunit": "^9.5",
+        "phpstan/phpstan": "^1.4"
+    },
+    "scripts": {
+        "phpstan": "vendor/bin/phpstan --ansi"
     }
 }
