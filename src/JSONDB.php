@@ -105,12 +105,10 @@ class JSONDB
         // Check if its arrays of jSON
         if (! is_array($content) && is_object($content)) {
             throw new \Exception('An array of json is required: Json data enclosed with []');
-            return false;
         }
         // An invalid jSON file
         elseif (! is_array($content) && ! is_object($content)) {
             throw new \Exception('json is invalid');
-            return false;
         } else {
             $this->content = $content;
             return true;
@@ -335,7 +333,7 @@ class JSONDB
                 }
             }
         } elseif (! empty($this->where) && empty($this->last_indexes)) {
-            null;
+            return;
         } else {
             foreach ($this->content as $i => $v) {
                 $content = (array) $this->content[$i];
