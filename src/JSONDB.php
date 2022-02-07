@@ -66,7 +66,7 @@ class JSONDB
          * Checks and validates if JSON file exists
          *
          * @return bool
-        */
+         */
 
         // Checks if JSON file exists, if not create
         if (! file_exists($this->file)) {
@@ -122,7 +122,7 @@ class JSONDB
          *
          * @param type $args Optional. Default *
          * @return type object
-        */
+         */
 
         // Explode to array
         $this->select = explode(',', $args);
@@ -141,7 +141,7 @@ class JSONDB
          *
          * @param type $file. Accepts file path to jSON file
          * @return type object
-        */
+         */
 
         $this->file = sprintf('%s/%s.json', $this->dir, str_replace('.json', '', $file)); // Adding .json extension is no longer necessary
 
@@ -167,7 +167,7 @@ class JSONDB
     }
 
     /**
-     * Implements regex search on where statement
+     * Implements regex search on where statement.
      *
      * @param	string	$pattern			Regex pattern
      * @param	int		$preg_match_flags	Flags for preg_grep(). See - https://www.php.net/manual/en/function.preg-match.php
