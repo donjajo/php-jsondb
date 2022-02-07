@@ -236,7 +236,7 @@ class JSONDB
         // $this->last_indexes = [ ( count( $this->content ) - 1 ) ];
         $this->commit();
 
-        // return $this->last_indexes;
+        return $this->last_indexes;
     }
 
     public function commit()
@@ -328,7 +328,7 @@ class JSONDB
                     if (! array_diff_key($this->update, $content)) {
                         $this->content[$i] = (object) array_merge($content, $this->update);
                     } else {
-                        throw new Exception('Update method has an off key');
+                        throw new \Exception('Update method has an off key');
                     }
                 } else {
                     continue;
@@ -342,7 +342,7 @@ class JSONDB
                 if (! array_diff_key($this->update, $content)) {
                     $this->content[$i] = (object) array_merge($content, $this->update);
                 } else {
-                    throw new Exception('Update method has an off key ');
+                    throw new \Exception('Update method has an off key ');
                 }
             }
         }
@@ -382,8 +382,6 @@ class JSONDB
 
     /**
      * Flushes indexes they won't be reused on next action
-     *
-     * @return object $this
      */
     private function flush_indexes($flush_where = false)
     {
