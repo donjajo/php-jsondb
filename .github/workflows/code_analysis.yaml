@@ -1,0 +1,33 @@
+name: Code Analysis
+
+on:
+    pull_request: null
+    push:
+        branches:
+            - master
+
+jobs:
+    code_analysis:
+        strategy:
+            fail-fast: false
+            matrix:
+                actions:
+                    -
+                        name: 'Coding Standard'
+                        run: vendor/bin/ecs check
+
+        name: ${{ matrix.actions.name }}
+        runs-on: ubuntu-latest
+
+        steps:
+            -   uses: actions/checkout@v2
+            # see https://github.com/shivammathur/setup-php
+            -   uses: shivammathur/setup-php@v2
+                with:
+                    php-version: 7.3
+                    coverage: none
+
+            # composer install cache - https://github.com/ramsey/composer-install
+            -   uses: "ramsey/composer-install@v1"
+
+            -   run: ${{ matrix.actions.run }}
