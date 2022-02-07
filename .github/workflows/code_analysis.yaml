@@ -14,7 +14,7 @@ jobs:
                 actions:
                     -
                         name: 'Coding Standard'
-                        run: vendor/bin/ecs check
+                        run: composer check-cs
 
         name: ${{ matrix.actions.name }}
         runs-on: ubuntu-latest
