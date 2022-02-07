@@ -24,5 +24,9 @@
     "require-dev": {
         "symplify/easy-coding-standard": "dev-main",
         "phpunit/phpunit": "^9.5"
+    },
+    "scripts": {
+        "check-cs": "vendor/bin/ecs check --ansi",
+        "fix-cs": "vendor/bin/ecs check --fix --ansi"
     }
 }
