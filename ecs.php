@@ -14,6 +14,12 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         __DIR__ . '/tests',
     ]);
 
+    $parameters->set(Option::PARALLEL, true);
+
+    $parameters->set(Option::SKIP, [
+        \PhpCsFixer\Fixer\ClassNotation\OrderedClassElementsFixer::class,
+    ]);
+
     $services = $containerConfigurator->services();
     $services->set(ArraySyntaxFixer::class)
         ->call('configure', [[
@@ -21,8 +27,11 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ]]);
 
     // run and fix, one by one
-    // $containerConfigurator->import(SetList::SPACES);
-    // $containerConfigurator->import(SetList::ARRAY);
-    // $containerConfigurator->import(SetList::DOCBLOCK);
-    // $containerConfigurator->import(SetList::PSR_12);
+    $containerConfigurator->import(SetList::SPACES);
+    $containerConfigurator->import(SetList::ARRAY);
+    $containerConfigurator->import(SetList::DOCBLOCK);
+    $containerConfigurator->import(SetList::COMMENTS);
+    $containerConfigurator->import(SetList::CONTROL_STRUCTURES);
+
+    $containerConfigurator->import(SetList::PSR_12);
 };
