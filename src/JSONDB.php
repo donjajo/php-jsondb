@@ -106,15 +106,14 @@ class JSONDB
         // Check if its arrays of jSON
         if (! is_array($content) && is_object($content)) {
             throw new \Exception('An array of json is required: Json data enclosed with []');
-            return false;
         }
         // An invalid jSON file
         elseif (! is_array($content) && ! is_object($content)) {
             throw new \Exception('json is invalid');
-            return false;
+        } else {
+            $this->content = $content;
+            return true;
         }
-        $this->content = $content;
-        return true;
     }
 
     public function select($args = '*')
@@ -171,7 +170,8 @@ class JSONDB
     /**
      * Implements regex search on where statement.
      *
-     * @param int $preg_match_flags See https://www.php.net/manual/en/function.preg-match.php
+     * @param	string	$pattern			Regex pattern
+     * @param	int		$preg_match_flags	Flags for preg_grep(). See - https://www.php.net/manual/en/function.preg-match.php
      */
     public static function regex(string $pattern, int $preg_match_flags = 0): object
     {
@@ -201,7 +201,6 @@ class JSONDB
      * @param string $file json filename without extension
      * @param array $values Array of columns as keys and values
      *
-     * @return array $last_indexes Array of last index inserted
      */
     public function insert($file, array $values)
     {
@@ -232,10 +231,7 @@ class JSONDB
         }
 
         $this->content[] = $values;
-        // $this->last_indexes = [ ( count( $this->content ) - 1 ) ];
         $this->commit();
-
-        // return $this->last_indexes;
     }
 
     public function commit()
@@ -327,21 +323,21 @@ class JSONDB
                     if (! array_diff_key($this->update, $content)) {
                         $this->content[$i] = (object) array_merge($content, $this->update);
                     } else {
-                        throw new Exception('Update method has an off key');
+                        throw new \Exception('Update method has an off key');
                     }
                 } else {
                     continue;
                 }
             }
         } elseif (! empty($this->where) && empty($this->last_indexes)) {
-            null;
+            return;
         } else {
             foreach ($this->content as $i => $v) {
                 $content = (array) $this->content[$i];
                 if (! array_diff_key($this->update, $content)) {
                     $this->content[$i] = (object) array_merge($content, $this->update);
                 } else {
-                    throw new Exception('Update method has an off key ');
+                    throw new \Exception('Update method has an off key ');
                 }
             }
         }
@@ -381,8 +377,6 @@ class JSONDB
 
     /**
      * Flushes indexes they won't be reused on next action
-     *
-     * @return object $this
      */
     private function flush_indexes($flush_where = false)
     {
