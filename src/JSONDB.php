@@ -114,8 +114,6 @@ class JSONDB
             $this->content = $content;
             return true;
         }
-        $this->content = $content;
-        return true;
     }
 
     public function select($args = '*')
