@@ -203,7 +203,6 @@ class JSONDB
      * @param string $file json filename without extension
      * @param array $values Array of columns as keys and values
      *
-     * @return array $last_indexes Array of last index inserted
      */
     public function insert($file, array $values)
     {
@@ -234,10 +233,7 @@ class JSONDB
         }
 
         $this->content[] = $values;
-        // $this->last_indexes = [ ( count( $this->content ) - 1 ) ];
         $this->commit();
-
-        return $this->last_indexes;
     }
 
     public function commit()
