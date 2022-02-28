@@ -108,12 +108,11 @@ class JSONDB
             throw new \Exception('An array of json is required: Json data enclosed with []');
         }
         // An invalid jSON file
-        elseif (! is_array($content) && ! is_object($content)) {
+        if (! is_array($content) && ! is_object($content)) {
             throw new \Exception('json is invalid');
-        } else {
-            $this->content = $content;
-            return true;
         }
+        $this->content = $content;
+        return true;
     }
 
     public function select($args = '*')
@@ -200,7 +199,6 @@ class JSONDB
      *
      * @param string $file json filename without extension
      * @param array $values Array of columns as keys and values
-     *
      */
     public function insert($file, array $values)
     {
