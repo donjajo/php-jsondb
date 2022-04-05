@@ -217,7 +217,7 @@ class JSONDB
             }
 
             foreach ($values as $col => $val) {
-                if (! isset($first_row[$col])) {
+                if (! array_key_exists($col, $first_row)) {
                     $unmatched_columns = 1;
                     break;
                 }
