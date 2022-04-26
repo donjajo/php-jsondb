@@ -68,10 +68,14 @@ class JSONDB
          * @return bool
          */
 
-        // Checks if JSON file exists, if not create
-        if (! file_exists($this->file)) {
-            touch($this->file);
-            // $this->commit();
+        // Checks if DIR exists, if not create
+        if( !is_dir( $this->dir ) ) {
+            mkdir($this->dir, 0700);
+            // Checks if JSON file exists, if not create
+            if( !file_exists( $this->file ) ) {
+                touch( $this->file );
+                // $this->commit();
+            }
         }
 
         if ($this->load == 'partial') {
@@ -100,7 +104,7 @@ class JSONDB
         } else {
             // Read content of JSON file
             $content = file_get_contents($this->file);
-            $content = json_decode($content, true);
+            $content = json_decode( ($content=="")?'[]':$content, true );
         }
 
         // Check if its arrays of jSON
