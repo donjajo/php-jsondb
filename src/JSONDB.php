@@ -104,7 +104,7 @@ class JSONDB
         } else {
             // Read content of JSON file
             $content = file_get_contents($this->file);
-            $content = json_decode(($content == '') ? '[]' : $content, true);
+            $content = json_decode($content, true);
         }
 
         // Check if its arrays of jSON
