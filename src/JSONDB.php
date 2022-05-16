@@ -68,6 +68,10 @@ class JSONDB
          * @return bool
          */
 
+        // Checks if DIR exists, if not create
+        if (! is_dir($this->dir)) {
+            mkdir($this->dir, 0700);
+        }
         // Checks if JSON file exists, if not create
         if (! file_exists($this->file)) {
             touch($this->file);
